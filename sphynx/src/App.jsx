@@ -735,6 +735,82 @@ function AboutPage() {
           <a className="text-link" href="#/projects">Explore our projects <Arrow /></a>
         </div>
       </section>
+      <section className="about-services section-pad">
+        <div className="page-width">
+          <SectionHeading
+            eyebrow="What we make and install"
+            title={<>Glass, aluminum <em>and more.</em></>}
+            copy="From glass supply and advanced processing to precise installation, our services support residential, commercial and architectural projects."
+          />
+          <div className="about-service-grid">
+            <article className="about-service-card glass-supply-card">
+              <img
+                className="about-service-image"
+                src={image('companys capabilities/Insulating-glass-sphynxglass-e1698000972334-768x528.jpg')}
+                alt="Insulating glass production"
+                loading="lazy"
+              />
+              <span className="eyebrow">Glass products and supply</span>
+              <h3>Selected materials. <em>Advanced production.</em></h3>
+              <p>
+                We select quality glass and invest in production equipment to meet
+                demanding project requirements. Low-E (low-emissivity) glass uses
+                a thin, nearly invisible silver or multi-layer metal coating to
+                improve comfort and building energy performance.
+              </p>
+              <ul className="service-benefits">
+                <li>Superior daylight control</li>
+                <li>Reduced solar heat</li>
+                <li>Improved energy efficiency</li>
+              </ul>
+              <h4>Glass production equipment</h4>
+              <ul className="equipment-list">
+                <li>Tempered glass production line</li>
+                <li>Automatic insulated glass unit (IGU) production line</li>
+                <li>Bent tempered glass production line</li>
+                <li>Double-edge machine</li>
+                <li>Horizontal edge grinding and cleaning line</li>
+              </ul>
+            </article>
+            <article className="about-service-card">
+              <img
+                className="about-service-image"
+                src={image('commercial projects/Automatic-slidingdoor-sphynxglass-1.jpg')}
+                alt="Glass and aluminum installation"
+                loading="lazy"
+              />
+              <span className="eyebrow">Glass and aluminum installation</span>
+              <h3>Careful installation. <em>Made for each space.</em></h3>
+              <p>
+                Our installation team brings precision and attention to quality to
+                every project. Solutions include frameless glass doors, glass
+                railings and aluminum frames for homes, commercial spaces,
+                storefronts and other applications.
+              </p>
+              <p>
+                Each installation is tailored to the project, balancing the
+                appearance and functionality of the finished space.
+              </p>
+            </article>
+            <article className="about-service-card">
+              <img
+                className="about-service-image"
+                src={image('architecture facades/architectural-glass-sphynxglass-e1697821702965.jpg')}
+                alt="Architectural glass and panel facade"
+                loading="lazy"
+              />
+              <span className="eyebrow">Aluminum composite panels</span>
+              <h3>Durable panels. <em>Distinctive exteriors.</em></h3>
+              <p>
+                We install aluminum composite panels for commercial and residential
+                projects. Their versatile finish supports contemporary facades and
+                renovations, bringing together functionality, visual appeal and
+                durability built to withstand the test of time.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
       <section className="vision-section">
         <div className="page-width vision-grid">
           <article><span className="eyebrow">Our vision</span><h2>Keep moving <em>forward.</em></h2><p>To continue growing and reaching more customers with high-standard products at competitive prices, while continuously improving our technology and capabilities.</p></article>
@@ -748,6 +824,7 @@ function AboutPage() {
             <article key={item.title}>
               <img src={image(item.image)} alt={item.title} loading="lazy" />
               <span>0{index + 1} / CAPABILITY</span><h3>{item.title}</h3>
+              <p>{item.description}</p>
             </article>
           ))}
         </div>

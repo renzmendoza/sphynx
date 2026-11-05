@@ -127,24 +127,29 @@ export const capabilities = [
   {
     title: 'Glass tempering',
     image: 'companys capabilities/glass-tempering-sphynxglass-e1698000910916.jpg',
+    description: 'Enhancing the strength and safety of glass through a precision tempering process.',
   },
   {
     title: 'Insulating glass',
     image:
       'companys capabilities/Insulating-glass-sphynxglass-e1698000972334-768x528.jpg',
+    description: 'Glass insulating provides energy-efficient solutions that enhance insulation and sustainability.',
   },
   {
     title: 'Aluminum extrusion',
     image:
       'companys capabilities/aluminum-extruding-scaled-e1698000952288-768x527.jpg',
+    description: 'Creating custom aluminum profiles and shapes for unique design and structural requirements.',
   },
   {
     title: 'Surface finishing',
     image: 'companys capabilities/Powder-Coating-Sphynxglass-768x527.jpg',
+    description: 'Powder coating finishing gives aluminum profiles a durable, consistent surface.',
   },
   {
     title: 'Aluminum anodizing',
     image: 'companys capabilities/glass_anodizing-sphynxglass-e1698000877320.jpg',
+    description: 'Glass anodizing achieves premium metal surface finishes, corrosion resistance and aesthetic appeal.',
   },
 ]
 

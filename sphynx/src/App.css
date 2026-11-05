@@ -1489,6 +1489,122 @@ button:hover .arrow-icon {
   margin-top: 26px;
 }
 
+.about-services {
+  background: #eeede7;
+}
+
+.about-service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 42px;
+}
+
+.about-service-card {
+  min-width: 0;
+  padding: 0 0 30px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.about-service-card > :not(.about-service-image) {
+  margin-right: clamp(24px, 3vw, 38px);
+  margin-left: clamp(24px, 3vw, 38px);
+}
+
+.about-service-image {
+  display: block;
+  width: 100%;
+  height: clamp(190px, 26vw, 300px);
+  margin-bottom: 26px;
+  object-fit: cover;
+  object-position: center;
+  background: #deddd5;
+}
+
+.glass-supply-card .about-service-image {
+  height: clamp(240px, 34vw, 390px);
+  object-position: center 45%;
+}
+
+.about-service-card > .eyebrow {
+  margin-top: 0;
+}
+
+.about-service-card > h3 {
+  margin-top: 14px;
+}
+
+.about-service-card > p {
+  margin-top: 14px;
+}
+
+.about-service-card > h4 {
+  margin-top: 24px;
+}
+
+.about-service-card > .service-benefits,
+.about-service-card > .equipment-list {
+  margin-top: 16px;
+}
+
+.glass-supply-card {
+  grid-column: 1 / -1;
+}
+
+.about-service-card h3 {
+  font-size: clamp(23px, 2.4vw, 32px);
+  line-height: 1.25;
+}
+
+.about-service-card h3 em {
+  color: #a68136;
+  font-weight: 500;
+}
+
+.about-service-card p {
+  max-width: 760px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.about-service-card h4 {
+  font-family: var(--heading);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.service-benefits,
+.equipment-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-benefits li,
+.equipment-list li {
+  position: relative;
+  padding-left: 17px;
+  color: #55544e;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.service-benefits li::before,
+.equipment-list li::before {
+  position: absolute;
+  top: .68em;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  content: '';
+}
+
 .vision-section {
   padding-block: 92px;
   background: #eeede7;
@@ -1549,6 +1665,13 @@ button:hover .arrow-icon {
 .capability-gallery-grid h3 {
   margin-top: 7px;
   font-size: 16px;
+}
+
+.capability-gallery-grid article > p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 /* Contact */
@@ -2373,6 +2496,20 @@ button:hover .arrow-icon {
   .about-story {
     grid-template-columns: 1fr;
     gap: 34px;
+  }
+
+  .about-service-grid {
+    grid-template-columns: 1fr;
+    margin-top: 30px;
+  }
+
+  .glass-supply-card {
+    grid-column: auto;
+  }
+
+  .service-benefits,
+  .equipment-list {
+    grid-template-columns: 1fr;
   }
 
   .about-story-image {
