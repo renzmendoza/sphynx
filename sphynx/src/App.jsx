@@ -39,6 +39,38 @@ function Arrow({ diagonal = false }) {
 
 function Header({ page }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState(null)
+
+  useEffect(() => {
+    if (!activeDropdown) return undefined
+
+    const closeOnOutsideClick = (event) => {
+      if (event.target instanceof Element && !event.target.closest('.nav-dropdown')) {
+        setActiveDropdown(null)
+      }
+    }
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        setActiveDropdown(null)
+        document.getElementById(`${activeDropdown}-trigger`)?.focus()
+      }
+    }
+
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [activeDropdown])
+
+  const toggleDropdown = (dropdown) => {
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      setActiveDropdown((active) => active === dropdown ? null : dropdown)
+    } else {
+      setActiveDropdown(dropdown)
+    }
+  }
 
   const nav = (
     <>
@@ -48,11 +80,26 @@ function Header({ page }) {
       <a className={page === 'about' ? 'active' : ''} href="#/about">
         About
       </a>
-      <details className="nav-dropdown">
-        <summary className={page.startsWith('products') ? 'active' : ''}>
+      <div
+        className={`nav-dropdown ${activeDropdown === 'products' ? 'is-open' : ''}`}
+        onMouseEnter={() => {
+          if (!window.matchMedia('(max-width: 760px)').matches) setActiveDropdown('products')
+        }}
+        onMouseLeave={() => {
+          if (!window.matchMedia('(max-width: 760px)').matches) setActiveDropdown(null)
+        }}
+      >
+        <button
+          aria-controls="products-menu"
+          aria-expanded={activeDropdown === 'products'}
+          className={`nav-dropdown-trigger ${page.startsWith('products') ? 'active' : ''}`}
+          id="products-trigger"
+          onClick={() => toggleDropdown('products')}
+          type="button"
+        >
           Products <span className="chevron" aria-hidden="true" />
-        </summary>
-        <div className="dropdown-panel">
+        </button>
+        <div className="dropdown-panel" id="products-menu">
           <a href="#/products">All products</a>
           {products.map((product) => (
             <a key={product.slug} href={`#/products/${product.slug}`}>
@@ -60,12 +107,27 @@ function Header({ page }) {
             </a>
           ))}
         </div>
-      </details>
-      <details className="nav-dropdown">
-        <summary className={page === 'projects' ? 'active' : ''}>
+      </div>
+      <div
+        className={`nav-dropdown ${activeDropdown === 'projects' ? 'is-open' : ''}`}
+        onMouseEnter={() => {
+          if (!window.matchMedia('(max-width: 760px)').matches) setActiveDropdown('projects')
+        }}
+        onMouseLeave={() => {
+          if (!window.matchMedia('(max-width: 760px)').matches) setActiveDropdown(null)
+        }}
+      >
+        <button
+          aria-controls="projects-menu"
+          aria-expanded={activeDropdown === 'projects'}
+          className={`nav-dropdown-trigger ${page === 'projects' ? 'active' : ''}`}
+          id="projects-trigger"
+          onClick={() => toggleDropdown('projects')}
+          type="button"
+        >
           Projects <span className="chevron" aria-hidden="true" />
-        </summary>
-        <div className="dropdown-panel">
+        </button>
+        <div className="dropdown-panel" id="projects-menu">
           <a href="#/projects">All projects</a>
           {projectFilters.slice(1).map((filter) => (
             <a href={`#/projects?category=${encodeURIComponent(filter)}`} key={filter}>
@@ -73,7 +135,7 @@ function Header({ page }) {
             </a>
           ))}
         </div>
-      </details>
+      </div>
       <a className={page === 'contact' ? 'active' : ''} href="#/contact">
         Contact
       </a>
@@ -88,17 +150,23 @@ function Header({ page }) {
       <div className="header-inner">
         <a className="brand-mark" href="#/" aria-label="Sphynx Glass and Aluminum home">
           <img
-            src={image('logos/logo for navigation.png')}
+            src={image('gold logo for navigation.png')}
             alt="Sphynx Glass and Aluminum"
             width="178"
-            height="54"
+            height="60"
           />
         </a>
         <nav
           className={`desktop-nav ${menuOpen ? 'mobile-open' : ''}`}
           aria-label="Main navigation"
           onClick={(event) => {
-            if (event.target instanceof Element && event.target.closest('a')) setMenuOpen(false)
+            if (event.target instanceof Element && event.target.closest('a')) {
+              setMenuOpen(false)
+              setActiveDropdown(null)
+            }
+          }}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setActiveDropdown(null)
           }}
         >
           {nav}
@@ -107,7 +175,10 @@ function Header({ page }) {
           aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={menuOpen}
           className={`menu-toggle ${menuOpen ? 'is-open' : ''}`}
-          onClick={() => setMenuOpen((open) => !open)}
+          onClick={() => {
+            if (menuOpen) setActiveDropdown(null)
+            setMenuOpen(!menuOpen)
+          }}
           type="button"
         >
           <span />
@@ -243,7 +314,7 @@ function HomePage() {
         <div className="hero-shade" />
         <div className="hero-content page-width">
           <span className="eyebrow">Sphynx Glass and Aluminum</span>
-          <h1>Engineering glass.<br /><em>Defining spaces.</em></h1>
+          <h1>Designed with glass.<br /><em>BUILT TO LAST.</em></h1>
           <p>
             Your trusted partner for glass and aluminum solutions, from residential
             installations to commercial and architectural projects.
@@ -266,7 +337,7 @@ function HomePage() {
         <div className="intro-content">
           <SectionHeading
             eyebrow="Expertise you can build on"
-            title={<>Made for the<br /><em>way forward.</em></>}
+            title={<>Made for the <em>way forward.</em></>}
           />
           <div className="intro-columns">
             <p className="lead-copy">
@@ -289,7 +360,7 @@ function HomePage() {
         <div className="page-width capability-layout">
           <div className="capability-copy">
             <span className="eyebrow">Our capabilities</span>
-            <h2>Built on expertise.<br /><em>Driven by precision.</em></h2>
+            <h2>Built on expertise. <em>Driven by precision.</em></h2>
             <p>
               From glass processing to aluminum finishing, explore the capabilities
               behind our work.
@@ -310,7 +381,7 @@ function HomePage() {
       <section className="services-section page-width section-pad">
         <SectionHeading
           eyebrow="What we do"
-          title={<>Solutions for<br /><em>every scale.</em></>}
+          title={<>Solutions for <em>every scale.</em></>}
           copy="Explore our work across homes, businesses and the built environment."
         />
         <div className="service-grid">
@@ -337,7 +408,7 @@ function HomePage() {
           <div className="section-topline">
             <SectionHeading
               eyebrow="Products and solutions"
-              title={<>Designed to<br /><em>perform.</em></>}
+              title={<>Designed to <em>perform.</em></>}
               copy="Explore selected glass and aluminum systems offered by SPHYNX."
             />
             <a className="text-link" href="#/products">View all products <Arrow /></a>
@@ -363,7 +434,7 @@ function HomePage() {
         <div className="section-topline">
           <SectionHeading
             eyebrow="Selected work"
-            title={<>Our latest<br /><em>work.</em></>}
+            title={<>Our latest <em>work.</em></>}
             copy="A selection of projects from our recent portfolio."
           />
           <a className="text-link" href="#/projects">View all projects <Arrow /></a>
@@ -387,7 +458,7 @@ function HomePage() {
         <div className="page-width section-pad">
           <SectionHeading
             eyebrow="The Sphynx advantage"
-            title={<>Good work is built<br /><em>on trust.</em></>}
+            title={<>Good work is built <em>on trust.</em></>}
             light
           />
           <div className="advantage-grid">
@@ -416,7 +487,7 @@ function HomePage() {
         <div className="closing-overlay" />
         <div className="closing-content page-width">
           <span className="eyebrow">Have a project in mind?</span>
-          <h2>Let’s build something<br /><em>exceptional.</em></h2>
+          <h2>Let’s build something <em>exceptional.</em></h2>
           <p>Let our team help you find the right glass and aluminum solution.</p>
           <a className="button button-gold" href="#/contact">Request a quote <Arrow diagonal /></a>
         </div>
@@ -435,7 +506,7 @@ function BrandStrip() {
       <div className="brand-marquee" aria-label="Client and partner logos">
         <div className="brand-track">
           {[...brands, ...brands].map((brand, index) => (
-            <div className="brand-logo" key={`${brand.name}-${index}`} aria-hidden={index >= brands.length}>
+            <div className="brand-logo-container" key={`${brand.name}-${index}`} aria-hidden={index >= brands.length}>
               <img src={image(brand.image)} alt={index >= brands.length ? '' : brand.name} loading="lazy" />
             </div>
           ))}
@@ -445,9 +516,9 @@ function BrandStrip() {
   )
 }
 
-function PageIntro({ label, title, copy }) {
+function PageIntro({ label, title, copy, className = '' }) {
   return (
-    <section className="page-intro page-width">
+    <section className={`page-intro page-width ${className}`}>
       <span className="eyebrow">{label}</span>
       <h1>{title}</h1>
       {copy && <p>{copy}</p>}
@@ -460,7 +531,7 @@ function ProductsPage() {
     <>
       <PageIntro
         label="Products / Systems"
-        title={<>Built around<br /><em>the view.</em></>}
+        title={<>Built around <em>the view.</em></>}
         copy="A considered selection of glass and aluminum systems for architectural and commercial projects."
       />
       <section className="catalog-grid page-width">
@@ -553,7 +624,7 @@ function ProductDetail({ slug }) {
       <section className="detail-overview page-width section-pad">
         <SectionHeading
           eyebrow="Product overview"
-          title={<>A clear approach<br /><em>to good design.</em></>}
+          title={<>A clear approach <em>to good design.</em></>}
           copy={product.description}
         />
         <div className="application-panel">
@@ -593,7 +664,7 @@ function ProjectsPage({ initialCategory }) {
     <>
       <PageIntro
         label="Projects / Portfolio"
-        title={<>Made to last.<br /><em>Made to matter.</em></>}
+        title={<>Made to last. <em>Made to matter.</em></>}
         copy="A look at selected residential, commercial and architectural projects from the SPHYNX portfolio."
       />
       <section className="gallery-section page-width">
@@ -642,7 +713,7 @@ function AboutPage() {
     <>
       <PageIntro
         label="About Sphynx"
-        title={<>Expertise you<br /><em>can build on.</em></>}
+        title={<>Expertise you <em>can build on.</em></>}
         copy="SPHYNX Glass and Aluminum is a solutions provider for residential, commercial, industrial and government projects."
       />
       <section className="about-story page-width section-pad">
@@ -652,7 +723,7 @@ function AboutPage() {
         </div>
         <div className="about-story-copy">
           <span className="eyebrow">Our approach</span>
-          <h2>Quality work.<br /><em>Built to last.</em></h2>
+          <h2>Quality work. <em>Built to last.</em></h2>
           <p>
             From supply and fabrication to installation, we focus on the details
             that make glass and aluminum work beautifully in a space.
@@ -666,12 +737,12 @@ function AboutPage() {
       </section>
       <section className="vision-section">
         <div className="page-width vision-grid">
-          <article><span className="eyebrow">Our vision</span><h2>Keep moving<br /><em>forward.</em></h2><p>To continue growing and reaching more customers with high-standard products at competitive prices, while continuously improving our technology and capabilities.</p></article>
-          <article><span className="eyebrow">Our mission</span><h2>Good service.<br /><em>Real value.</em></h2><ul><li>Provide innovative products at reasonable costs.</li><li>Deliver quality services and complete work on schedule.</li><li>Provide durable materials that stand the test of time.</li></ul></article>
+          <article><span className="eyebrow">Our vision</span><h2>Keep moving <em>forward.</em></h2><p>To continue growing and reaching more customers with high-standard products at competitive prices, while continuously improving our technology and capabilities.</p></article>
+          <article><span className="eyebrow">Our mission</span><h2>Good service. <em>Real value.</em></h2><ul><li>Provide innovative products at reasonable costs.</li><li>Deliver quality services and complete work on schedule.</li><li>Provide durable materials that stand the test of time.</li></ul></article>
         </div>
       </section>
       <section className="capability-gallery page-width section-pad">
-        <SectionHeading eyebrow="Our capabilities" title={<>A closer look<br /><em>at the process.</em></>} />
+        <SectionHeading eyebrow="Our capabilities" title={<>A closer look <em>at the process.</em></>} />
         <div className="capability-gallery-grid">
           {capabilities.map((item, index) => (
             <article key={item.title}>
@@ -727,7 +798,7 @@ function ContactPage({ params }) {
       console.error('Quote request could not be delivered:', error)
       setStatus({
         type: 'error',
-        text: 'We could not deliver your request just now. Please try again later or contact SPHYNX through the official website.',
+        text: 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
       })
     } finally {
       setSending(false)
@@ -738,29 +809,35 @@ function ContactPage({ params }) {
     <>
       <PageIntro
         label="Contact / Get a quote"
-        title={<>Let’s start<br /><em>a conversation.</em></>}
+        title={<>Let's work <em>TOGETHER.</em></>}
+        className="contact-intro"
         copy="Tell us a little about your project and our team can help you explore the right solution."
       />
       <section className="contact-layout page-width">
         <div className="contact-details">
-          <span className="eyebrow">Visit our offices</span>
+          <span className="eyebrow contact-details-heading"><i aria-hidden="true" className="bi bi-geo-alt-fill" /> Office locations</span>
           <div className="office-block">
-            <span>MAKATI OFFICE</span>
+            <span><i aria-hidden="true" className="bi bi-geo-alt" /> MAKATI OFFICE</span>
             <p>Unit 235, Mile Long Building, Amorsolo Street corner Rufino Street, Barangay San Lorenzo, Makati City.</p>
             <a href="https://maps.google.com/?q=Unit+235+Mile+Long+Building+Amorsolo+Rufino+Makati+City" target="_blank" rel="noreferrer">Get directions <Arrow diagonal /></a>
           </div>
           <div className="office-block">
-            <span>PASAY OFFICE</span>
+            <span><i aria-hidden="true" className="bi bi-geo-alt" /> PASAY OFFICE</span>
             <p>2955 EDSA Corner Taft Avenue, Pasay City.</p>
             <a href="https://maps.google.com/?q=2955+EDSA+Corner+Taft+Avenue+Pasay+City" target="_blank" rel="noreferrer">Get directions <Arrow diagonal /></a>
           </div>
-          <div className="office-hours"><span>BUSINESS HOURS</span><p>Monday to Friday<br />8:00 AM – 5:00 PM</p></div>
-          <a className="official-site-link" href="https://sphynxglass.com/" target="_blank" rel="noreferrer">Visit official website <Arrow diagonal /></a>
+          <div className="office-hours">
+            <span><i aria-hidden="true" className="bi bi-clock-fill" /> BUSINESS HOURS</span>
+            <p className="office-schedule">
+              <span><i aria-hidden="true" className="bi bi-calendar-week" /> Monday to Friday</span>
+              <span><i aria-hidden="true" className="bi bi-clock" /> 8:00 AM – 5:00 PM</span>
+            </p>
+          </div>
         </div>
         <form className="inquiry-form" onSubmit={submitInquiry}>
           <div className="form-heading">
             <span className="eyebrow">Request a quote</span>
-            <h2>Tell us about<br /><em>your project.</em></h2>
+            <h2>Tell us about <em>your project.</em></h2>
           </div>
           <div className="form-row">
             <label>First name<input name="firstName" autoComplete="given-name" required /></label>
@@ -794,7 +871,7 @@ function ContactPage({ params }) {
           <label>Attach a file or image <span>(optional)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
           <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex="-1" autoComplete="off" /></label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
-          {!endpoint && <p className="endpoint-note">Inquiry delivery needs to be configured before this form can send. You can also use the official SPHYNX website link.</p>}
+          {!endpoint && <p className="endpoint-note">Inquiry delivery needs to be configured before this form can send. Please contact SPHYNX using the office information on this page.</p>}
           <button className="button button-dark form-submit" type="submit" disabled={sending}>
             {sending ? 'Sending…' : 'Request a quote'} <Arrow />
           </button>
@@ -808,7 +885,7 @@ function QuoteBand({ product, category }) {
   return (
     <section className="quote-band">
       <div className="page-width quote-band-inner">
-        <div><span className="eyebrow">Have a project in mind?</span><h2>Let’s talk about<br /><em>what’s possible.</em></h2></div>
+        <div><span className="eyebrow">Have a project in mind?</span><h2>Let’s talk about <em>what’s possible.</em></h2></div>
         <a
           className="button button-gold"
           href={
@@ -841,7 +918,7 @@ function Footer() {
           <span>Products</span>{products.map((product) => <a href={`#/products/${product.slug}`} key={product.slug}>{product.name}</a>)}
         </div>
         <div className="footer-links">
-          <span>Get in touch</span><a href="#/contact">Request a quote</a><a href="https://sphynxglass.com/" target="_blank" rel="noreferrer">Official website <Arrow diagonal /></a><p>Monday to Friday<br />8:00 AM – 5:00 PM</p>
+          <span>Get in touch</span><a href="#/contact">Request a quote</a><p>Monday to Friday<br />8:00 AM – 5:00 PM</p>
         </div>
       </div>
       <div className="page-width footer-bottom"><span>© {currentYear} SPHYNX Glass and Aluminum</span><span>Engineering glass. Defining spaces.</span></div>

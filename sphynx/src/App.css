@@ -37,9 +37,32 @@ h3 {
   font-weight: 500;
 }
 
+p {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+h2 {
+  font-family: var(--heading);
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.2;
+}
+
+h1 {
+  max-width: 100%;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.12;
+}
+
 h1 em,
 h2 em {
   font-weight: 400;
+}
+
+h1 em {
+  font-weight: 600;
 }
 
 .button {
@@ -192,7 +215,7 @@ button:hover .arrow-icon {
 }
 
 .desktop-nav > a:not(.button),
-.nav-dropdown summary {
+.nav-dropdown-trigger {
   position: relative;
   color: #4a4943;
   cursor: pointer;
@@ -204,7 +227,7 @@ button:hover .arrow-icon {
 }
 
 .desktop-nav > a:not(.button)::after,
-.nav-dropdown summary::after {
+.nav-dropdown-trigger::after {
   position: absolute;
   right: 0;
   bottom: -9px;
@@ -219,24 +242,25 @@ button:hover .arrow-icon {
 
 .desktop-nav > a:hover::after,
 .desktop-nav > a.active::after,
-.nav-dropdown summary:hover::after,
-.nav-dropdown summary.active::after {
+.nav-dropdown-trigger:hover::after,
+.nav-dropdown-trigger.active::after {
   transform: scaleX(1);
 }
 
 .nav-dropdown {
   position: relative;
+  height: 100%;
 }
 
-.nav-dropdown summary {
+.nav-dropdown-trigger {
   display: flex;
+  height: 100%;
   align-items: center;
   gap: 7px;
-  list-style: none;
-}
-
-.nav-dropdown summary::-webkit-details-marker {
-  display: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
 }
 
 .chevron {
@@ -245,21 +269,42 @@ button:hover .arrow-icon {
   border-right: 1px solid currentColor;
   border-bottom: 1px solid currentColor;
   transform: rotate(45deg) translateY(-2px);
+  transition: transform .18s ease;
+}
+
+.nav-dropdown.is-open .chevron {
+  transform: rotate(225deg) translateY(-2px);
 }
 
 .dropdown-panel {
   position: absolute;
-  top: 31px;
+  z-index: 20;
+  top: 100%;
   left: -18px;
   display: grid;
-  min-width: 200px;
+  width: 240px;
   padding: 10px 0;
   border: 1px solid var(--line);
   background: var(--paper);
   box-shadow: 0 14px 35px rgba(0, 0, 0, .08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+  visibility: hidden;
+}
+
+.nav-dropdown.is-open .dropdown-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  visibility: visible;
 }
 
 .dropdown-panel a {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
   padding: 11px 18px;
   color: var(--ink);
   font-size: 11px;
@@ -326,9 +371,9 @@ button:hover .arrow-icon {
 .hero h1 {
   max-width: 850px;
   margin-top: 24px;
-  font-size: clamp(50px, 7.2vw, 94px);
-  letter-spacing: -.075em;
-  line-height: .99;
+  font-size: clamp(30px, 5.4vw, 70px);
+  letter-spacing: -.035em;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -342,7 +387,6 @@ button:hover .arrow-icon {
   max-width: 530px;
   margin-top: 26px;
   color: rgba(255, 255, 255, .76);
-  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -409,8 +453,8 @@ button:hover .arrow-icon {
 .section-heading h2 {
   margin-top: 14px;
   font-size: clamp(37px, 4vw, 56px);
-  letter-spacing: -.065em;
-  line-height: 1.06;
+  letter-spacing: -.025em;
+  line-height: 1.2;
 }
 
 .section-heading h2 em {
@@ -421,7 +465,6 @@ button:hover .arrow-icon {
   max-width: 435px;
   margin-top: 20px;
   color: var(--muted);
-  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -434,7 +477,6 @@ button:hover .arrow-icon {
 
 .intro-columns p {
   color: var(--muted);
-  font-size: 13px;
   line-height: 1.85;
 }
 
@@ -471,8 +513,8 @@ button:hover .arrow-icon {
 .closing-content h2 {
   margin-top: 18px;
   font-size: clamp(36px, 4.2vw, 56px);
-  letter-spacing: -.065em;
-  line-height: 1.07;
+  letter-spacing: -.025em;
+  line-height: 1.2;
 }
 
 .capability-copy h2 em {
@@ -483,7 +525,6 @@ button:hover .arrow-icon {
   max-width: 350px;
   margin-top: 21px;
   color: rgba(255, 255, 255, .65);
-  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -717,7 +758,6 @@ button:hover .arrow-icon {
   max-width: 520px;
   margin-top: 9px;
   color: var(--muted);
-  font-size: 12px;
   line-height: 1.75;
 }
 
@@ -787,50 +827,71 @@ button:hover .arrow-icon {
 
 .brands-heading h2 {
   font-size: clamp(22px, 3vw, 34px);
-  letter-spacing: -.05em;
+  letter-spacing: -.025em;
 }
 
 .brand-marquee {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.brand-marquee::-webkit-scrollbar {
+  display: none;
 }
 
 .brand-track {
   display: flex;
   width: max-content;
   align-items: center;
+  gap: 20px;
   animation: marquee 42s linear infinite;
 }
 
-.brand-marquee:hover .brand-track {
+.brand-track::after {
+  flex: 0 0 0;
+  content: '';
+}
+
+.brand-marquee:hover .brand-track,
+.brand-marquee:active .brand-track {
   animation-play-state: paused;
 }
 
-.brand-logo {
-  display: grid;
-  width: 178px;
-  height: 78px;
+.brand-logo-container {
+  display: flex;
+  width: 180px;
+  height: 100px;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  place-items: center;
-  margin-inline: 18px;
-  padding: 14px 20px;
+  padding: 15px;
+  overflow: visible;
 }
 
-.brand-logo img {
+.brand-logo-container img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   filter: grayscale(1);
   opacity: .58;
   transition: filter .2s ease, opacity .2s ease;
 }
 
-.brand-logo:hover img {
+.brand-logo-container:hover img {
   filter: grayscale(0);
   opacity: 1;
 }
 
 @keyframes marquee {
   to { transform: translateX(-50%); }
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Advantage and CTA */
@@ -880,7 +941,7 @@ button:hover .arrow-icon {
   max-width: 300px;
   margin-top: 8px;
   color: rgba(255, 255, 255, .62);
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.7;
 }
 
@@ -926,7 +987,6 @@ button:hover .arrow-icon {
 .closing-content > p {
   margin-top: 18px;
   color: rgba(255, 255, 255, .75);
-  font-size: 13px;
 }
 
 .closing-content .button {
@@ -942,8 +1002,8 @@ button:hover .arrow-icon {
 .page-intro h1 {
   margin-top: 17px;
   font-size: clamp(50px, 7vw, 86px);
-  letter-spacing: -.075em;
-  line-height: .99;
+  letter-spacing: -.035em;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -956,7 +1016,6 @@ button:hover .arrow-icon {
   max-width: 600px;
   margin-top: 22px;
   color: var(--muted);
-  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -1005,7 +1064,7 @@ button:hover .arrow-icon {
 .catalog-copy h2 {
   margin-top: 8px;
   font-size: 30px;
-  letter-spacing: -.05em;
+  letter-spacing: -.025em;
   text-transform: uppercase;
 }
 
@@ -1013,7 +1072,6 @@ button:hover .arrow-icon {
   max-width: 530px;
   margin-top: 12px;
   color: var(--muted);
-  font-size: 12px;
   line-height: 1.8;
 }
 
@@ -1034,8 +1092,8 @@ button:hover .arrow-icon {
 .detail-copy h1 {
   margin-top: 20px;
   font-size: clamp(45px, 6vw, 74px);
-  letter-spacing: -.07em;
-  line-height: .98;
+  letter-spacing: -.035em;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -1048,7 +1106,6 @@ button:hover .arrow-icon {
   max-width: 470px;
   margin-top: 22px;
   color: var(--muted);
-  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -1138,7 +1195,6 @@ button:hover .arrow-icon {
 .application-panel > p {
   max-width: 440px;
   color: var(--muted);
-  font-size: 12px;
   line-height: 1.8;
 }
 
@@ -1415,8 +1471,8 @@ button:hover .arrow-icon {
 .about-story-copy h2 {
   margin-top: 14px;
   font-size: clamp(38px, 4vw, 54px);
-  letter-spacing: -.06em;
-  line-height: 1.05;
+  letter-spacing: -.025em;
+  line-height: 1.2;
 }
 
 .about-story-copy h2 em {
@@ -1426,7 +1482,6 @@ button:hover .arrow-icon {
 .about-story-copy p {
   margin-top: 18px;
   color: var(--muted);
-  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -1448,8 +1503,8 @@ button:hover .arrow-icon {
 .vision-grid h2 {
   margin-top: 15px;
   font-size: clamp(36px, 4vw, 50px);
-  letter-spacing: -.06em;
-  line-height: 1.05;
+  letter-spacing: -.025em;
+  line-height: 1.2;
 }
 
 .vision-grid h2 em {
@@ -1461,7 +1516,6 @@ button:hover .arrow-icon {
   max-width: 485px;
   margin-top: 21px;
   color: var(--muted);
-  font-size: 13px;
   line-height: 1.8;
 }
 
@@ -1500,10 +1554,14 @@ button:hover .arrow-icon {
 /* Contact */
 .contact-layout {
   display: grid;
-  grid-template-columns: .74fr 1.26fr;
+  grid-template-columns: .9fr 1.1fr;
   align-items: start;
-  gap: 90px;
-  padding-block: 65px 110px;
+  gap: clamp(32px, 5vw, 64px);
+  padding-block: 32px 100px;
+}
+
+.contact-intro {
+  padding-block: 76px 28px;
 }
 
 .contact-details {
@@ -1524,17 +1582,40 @@ button:hover .arrow-icon {
   letter-spacing: .15em;
 }
 
+.contact-details-heading .bi,
+.office-block > span .bi,
+.office-hours > span .bi,
+.office-schedule .bi {
+  margin-right: .4em;
+  color: var(--gold);
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.contact-details-heading .bi,
+.office-hours > span .bi {
+  font-size: 15px;
+}
+
 .office-block p,
 .office-hours p {
-  max-width: 330px;
+  max-width: 390px;
   margin-top: 10px;
   color: #55544e;
-  font-size: 12px;
   line-height: 1.8;
 }
 
-.office-block a,
-.official-site-link {
+.office-hours .office-schedule {
+  display: grid;
+  gap: 5px;
+}
+
+.office-schedule > span {
+  display: flex;
+  align-items: baseline;
+}
+
+.office-block a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1547,18 +1628,12 @@ button:hover .arrow-icon {
   text-transform: uppercase;
 }
 
-.office-block .arrow-icon,
-.official-site-link .arrow-icon {
+.office-block .arrow-icon {
   width: 14px;
 }
 
 .office-hours {
   padding-top: 24px;
-}
-
-.official-site-link {
-  margin-top: 26px;
-  color: #8e6d2a;
 }
 
 .inquiry-form {
@@ -1573,8 +1648,8 @@ button:hover .arrow-icon {
 .form-heading h2 {
   margin-top: 10px;
   font-size: 38px;
-  letter-spacing: -.06em;
-  line-height: 1.05;
+  letter-spacing: -.025em;
+  line-height: 1.2;
 }
 
 .form-heading h2 em {
@@ -1651,7 +1726,7 @@ button:hover .arrow-icon {
   border-left: 2px solid #a68136;
   color: #625e51;
   background: #e7e4da;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.65;
 }
 
@@ -1695,8 +1770,8 @@ button:hover .arrow-icon {
 .quote-band h2 {
   margin-top: 13px;
   font-size: clamp(32px, 4vw, 48px);
-  letter-spacing: -.065em;
-  line-height: 1.08;
+  letter-spacing: -.025em;
+  line-height: 1.2;
 }
 
 .quote-band h2 em {
@@ -1726,7 +1801,7 @@ button:hover .arrow-icon {
   max-width: 270px;
   margin-top: 18px;
   color: rgba(255, 255, 255, .55);
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -1749,7 +1824,7 @@ button:hover .arrow-icon {
 .footer-links a,
 .footer-links p {
   color: rgba(255, 255, 255, .72);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
   text-decoration: none;
 }
@@ -1791,6 +1866,11 @@ button:hover .arrow-icon {
     width: calc(100% - 52px);
   }
 
+  .brand-logo-container {
+    width: 150px;
+    height: 95px;
+  }
+
   .desktop-nav {
     gap: 19px;
   }
@@ -1826,6 +1906,47 @@ button:hover .arrow-icon {
 
   .footer-main {
     gap: 30px;
+  }
+}
+
+@media (max-width: 991px) {
+  p {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .contact-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-block: 32px 75px;
+  }
+
+  .contact-details {
+    display: contents;
+  }
+
+  .contact-details > .eyebrow {
+    order: 3;
+    margin-top: 4px;
+  }
+
+  .contact-details > .office-block:first-of-type {
+    order: 4;
+  }
+
+  .contact-details > .office-block:nth-child(3) {
+    order: 5;
+  }
+
+  .contact-details > .office-hours {
+    order: 6;
+  }
+
+  .contact-layout > .inquiry-form {
+    order: 2;
+    width: 100%;
+    margin-bottom: 28px;
   }
 }
 
@@ -1871,7 +1992,7 @@ button:hover .arrow-icon {
   }
 
   .desktop-nav > a:not(.button),
-  .nav-dropdown summary {
+  .nav-dropdown-trigger {
     display: flex;
     min-height: 55px;
     align-items: center;
@@ -1880,29 +2001,41 @@ button:hover .arrow-icon {
   }
 
   .desktop-nav > a:not(.button)::after,
-  .nav-dropdown summary::after {
+  .nav-dropdown-trigger::after {
     content: none;
   }
 
   .nav-dropdown {
+    height: auto;
     border-bottom: 1px solid var(--line);
   }
 
-  .nav-dropdown summary {
+  .nav-dropdown-trigger {
+    width: 100%;
+    height: auto;
     justify-content: space-between;
+    padding: 0;
     border: 0;
   }
 
   .dropdown-panel {
     position: static;
-    min-width: 0;
+    display: none;
+    width: 100%;
     border: 0;
     background: transparent;
     box-shadow: none;
+    transform: none;
+  }
+
+  .nav-dropdown.is-open .dropdown-panel {
+    display: grid;
+    animation: dropdown-in .18s ease-out both;
   }
 
   .dropdown-panel a {
-    padding: 10px 12px;
+    min-height: 48px;
+    padding: 14px 12px;
     color: var(--muted);
     font-size: 13px;
   }
@@ -1955,12 +2088,11 @@ button:hover .arrow-icon {
   }
 
   .hero h1 {
-    font-size: clamp(47px, 11vw, 70px);
+    font-size: clamp(38px, 10vw, 64px);
   }
 
   .hero-content > p {
     max-width: 430px;
-    font-size: 13px;
   }
 
   .hero-index {
@@ -1984,6 +2116,11 @@ button:hover .arrow-icon {
 
   .section-heading h2 {
     font-size: clamp(37px, 9vw, 52px);
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.65;
   }
 
   .intro-columns {
@@ -2073,10 +2210,10 @@ button:hover .arrow-icon {
     gap: 10px;
   }
 
-  .brand-logo {
-    width: 140px;
-    height: 70px;
-    margin-inline: 8px;
+  .brand-logo-container {
+    width: 130px;
+    height: 90px;
+    padding: 12px;
   }
 
   .advantage-grid {
@@ -2104,6 +2241,10 @@ button:hover .arrow-icon {
 
   .page-intro {
     padding-block: 72px 52px;
+  }
+
+  .contact-intro {
+    padding-block: 62px 24px;
   }
 
   .page-intro h1 {
@@ -2256,16 +2397,6 @@ button:hover .arrow-icon {
     height: 160px;
   }
 
-  .contact-layout {
-    grid-template-columns: 1fr;
-    gap: 45px;
-    padding-block: 42px 75px;
-  }
-
-  .contact-details {
-    position: static;
-  }
-
   .inquiry-form {
     padding: 26px 20px;
   }
@@ -2303,7 +2434,7 @@ button:hover .arrow-icon {
   }
 
   .hero h1 {
-    font-size: 45px;
+    font-size: clamp(36px, 11vw, 46px);
   }
 
   .hero-actions {
