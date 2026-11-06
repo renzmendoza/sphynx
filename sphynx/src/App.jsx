@@ -1069,14 +1069,33 @@ function ContactPage({ params }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      if (!response.ok) throw new Error(`Inquiry endpoint returned ${response.status}`)
+      let result
+      try {
+        result = await response.json()
+      } catch {
+        result = null
+      }
+      if (!response.ok) {
+        const message =
+          typeof result?.message === 'string'
+            ? result.message
+            : response.status === 404
+              ? 'The quote service is unavailable. Please deploy the site with its Vercel API function enabled.'
+              : `The quote service returned an unexpected response (${response.status}). Please try again later.`
+        throw new Error(message)
+      }
+      if (typeof result?.message !== 'string') {
+        throw new Error('The quote service returned an invalid response. Please try again later.')
+      }
       setStatus({ type: 'success', text: 'Thank you. Your quote request has been sent.' })
       form.reset()
     } catch (error) {
       console.error('Quote request could not be delivered:', error)
       setStatus({
         type: 'error',
-        text: 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
+        text: error instanceof Error
+          ? error.message
+          : 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
       })
     } finally {
       setSending(false)

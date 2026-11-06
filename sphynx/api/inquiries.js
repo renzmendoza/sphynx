@@ -134,7 +134,11 @@ export default async function handler(req, res) {
   if (!inquiry) return respond(res, 400, 'Please check the form fields and try again.')
   if (!process.env.RESEND_API_KEY || !process.env.INQUIRY_FROM_EMAIL) {
     console.error('Quote delivery is missing RESEND_API_KEY or INQUIRY_FROM_EMAIL.')
-    return respond(res, 503, 'Quote requests are temporarily unavailable. Please try again later.')
+    return respond(
+      res,
+      503,
+      'Email delivery is not configured. Add RESEND_API_KEY and INQUIRY_FROM_EMAIL to the Vercel project settings, then redeploy.',
+    )
   }
 
   const attachment = parseAttachment(inquiry.attachment)
@@ -184,7 +188,12 @@ export default async function handler(req, res) {
 
   if (!response.ok) {
     console.error(`Resend rejected quote email with status ${response.status}.`)
-    return respond(res, 502, 'We could not deliver your request just now. Please try again later.')
+    const message = [401, 403, 422].includes(response.status)
+      ? 'Email delivery setup needs attention. Please contact the site administrator.'
+      : response.status === 429
+        ? 'The email service is busy. Please wait a moment and try again.'
+        : 'The email service is temporarily unavailable. Please try again later.'
+    return respond(res, 502, message)
   }
 
   return respond(res, 200, 'Thank you. Your quote request has been sent.')
