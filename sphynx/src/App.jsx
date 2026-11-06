@@ -14,7 +14,6 @@ const projectFilters = [
 const currentYear = new Date().getFullYear()
 const brandSpeed = 32
 const wrapOffset = (value, width) => ((value % width) + width) % width
-const maxInquiryAttachmentSize = 3 * 1024 * 1024
 
 const routeInfo = () => {
   const [path = 'home', query = ''] = window.location.hash
@@ -1020,31 +1019,41 @@ function ContactPage({ params }) {
     Facades: 'Architectural Facades',
   }
   const initialProjectType = projectTypeByCategory[params.get('category')] ?? ''
-  const [status, setStatus] = useState(
-    params.get('submitted') === '1'
-      ? {
-          type: 'success',
-          text: 'Your request was submitted. If this was your first submission, check renzumendoza@gmail.com for FormSubmit’s activation email and confirm the form.',
-        }
-      : null,
-  )
+  const [status, setStatus] = useState(null)
 
-  function validateInquiry(event) {
+  function openEmailDraft(event) {
+    event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    if (formData.get('_honey')) {
-      event.preventDefault()
-      setStatus({ type: 'error', text: 'Unable to submit this request. Please try again.' })
-      return
-    }
-    const attachment = formData.get('attachment')
-    if (attachment instanceof File && attachment.size > maxInquiryAttachmentSize) {
-      event.preventDefault()
-      setStatus({
-        type: 'error',
-        text: 'Attachments must be 3 MB or smaller. Please choose a smaller file and try again.',
-      })
-      return
-    }
+    const selectedFile = formData.get('attachment')
+    const attachmentNote =
+      selectedFile instanceof File && selectedFile.name
+        ? `\nSelected file (attach it manually in your email app): ${selectedFile.name}`
+        : ''
+    const body = [
+      'Hello SPHYNX,',
+      '',
+      'I would like to request a quote. Here are my project details:',
+      '',
+      `Name: ${formData.get('firstName')} ${formData.get('lastName')}`,
+      `Email: ${formData.get('email')}`,
+      `Phone: ${formData.get('phone')}`,
+      `Company: ${formData.get('company') || 'Not provided'}`,
+      `Project type: ${formData.get('projectType')}`,
+      `Product of interest: ${formData.get('productInterest')}`,
+      `Project location: ${formData.get('location')}`,
+      `Estimated budget: ${formData.get('budget') || 'Not provided'}`,
+      '',
+      'Project description:',
+      formData.get('description'),
+      attachmentNote,
+    ].join('\n')
+    const subject = `SPHYNX quote request - ${formData.get('firstName')} ${formData.get('lastName')}`
+
+    setStatus({
+      type: 'info',
+      text: 'Your email app should open with the quote details filled in. Review the message and press Send. Attach any selected files manually.',
+    })
+    window.location.href = `mailto:renzumendoza@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   }
 
   return (
@@ -1076,16 +1085,7 @@ function ContactPage({ params }) {
             </p>
           </div>
         </div>
-        <form
-          action="https://formsubmit.co/renzumendoza@gmail.com"
-          className="inquiry-form"
-          encType="multipart/form-data"
-          method="POST"
-          onSubmit={validateInquiry}
-        >
-          <input name="_next" type="hidden" value={`${window.location.origin}/#/contact?submitted=1`} />
-          <input name="_subject" type="hidden" value="New SPHYNX quote request" />
-          <input name="_template" type="hidden" value="table" />
+        <form className="inquiry-form" onSubmit={openEmailDraft}>
           <div className="form-heading">
             <span className="eyebrow">Request a quote</span>
             <h2>Tell us about <em>your project.</em></h2>
@@ -1095,7 +1095,7 @@ function ContactPage({ params }) {
             <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
           </div>
           <div className="form-row">
-            <label>Email address<input name="_replyto" type="email" autoComplete="email" required /></label>
+            <label>Email address<input name="email" type="email" autoComplete="email" required /></label>
             <label>Phone number<input name="phone" type="tel" autoComplete="tel" pattern="[+0-9 ]{7,20}" title="Enter a valid phone number using digits, spaces, and an optional plus sign" required /></label>
           </div>
           <label>Company name <span>(optional)</span><input name="company" autoComplete="organization" /></label>
@@ -1119,11 +1119,10 @@ function ContactPage({ params }) {
             <label>Estimated budget <span>(optional)</span><input name="budget" inputMode="text" /></label>
           </div>
           <label>Project description<textarea name="description" rows="5" required /></label>
-          <label>Attach a file or image <span>(optional, max 3 MB)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
-          <label className="honeypot" aria-hidden="true">Website<input name="_honey" tabIndex="-1" autoComplete="off" /></label>
+          <label>Attach a file or image <span>(optional; attach it manually in your email app)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
           <button className="button button-dark form-submit" type="submit">
-            Request a quote <Arrow />
+            Open email to send <Arrow />
           </button>
         </form>
       </section>

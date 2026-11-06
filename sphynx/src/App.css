@@ -1862,6 +1862,12 @@ button:hover .arrow-icon {
   background: #e5eee5;
 }
 
+.form-status.info {
+  border-color: #a68136;
+  color: #625e51;
+  background: #e7e4da;
+}
+
 .form-submit {
   width: 100%;
   justify-content: space-between;

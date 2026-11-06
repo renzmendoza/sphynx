@@ -18,11 +18,7 @@ npm run build
 
 ## Quote request delivery
 
-The quote form sends submissions directly from the browser to `renzumendoza@gmail.com` through FormSubmit's standard HTML form endpoint, avoiding cross-origin AJAX restrictions. No custom domain or API key is required. The optional attachment is limited to 3 MB. Form data is submitted directly to FormSubmit, a third-party service.
-
-On the first submission, FormSubmit sends an activation message to the recipient address. Open that message and confirm the form; submissions will not be forwarded until activation is complete. Afterward, test the form and check the recipient inbox and spam folder.
-
-The form includes FormSubmit's honeypot field. Review FormSubmit's service terms and privacy practices before using the form for personal information.
+The quote form opens a prefilled email draft addressed to `renzumendoza@gmail.com` using the visitor's default email app. No backend, email service account, or API key is required. Visitors must review and send the draft themselves. Browsers cannot attach a selected file through a `mailto:` link, so the form reminds visitors to attach it manually in their email app.
 
 ## Routes
 
