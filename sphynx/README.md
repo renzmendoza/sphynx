@@ -18,7 +18,9 @@ npm run build
 
 ## Quote request delivery
 
-The quote form opens a prefilled Gmail compose window addressed to `renzumendoza@gmail.com`. No backend, email service account, or API key is required. Visitors must be signed in to Gmail, review the draft, and send it themselves. Browsers cannot attach a selected file through a compose link, so the form reminds visitors to attach it manually in Gmail.
+The quote form sends inquiries through [Web3Forms](https://web3forms.com/) to the email address verified when its access key is created. Create an access key for `renzumendoza@gmail.com`, add it to Vercel as `VITE_WEB3FORMS_ACCESS_KEY`, and redeploy. The access key is designed for browser-side forms and is public in the built client. For local development, set it in `.env.local` (see `.env.example`).
+
+The form submits JSON directly to Web3Forms. File attachments require a paid Web3Forms plan, so the free integration does not include file uploads. Form data is handled by Web3Forms; review its privacy terms before collecting customer information.
 
 ## Routes
 

@@ -14,6 +14,7 @@ const projectFilters = [
 const currentYear = new Date().getFullYear()
 const brandSpeed = 32
 const wrapOffset = (value, width) => ((value % width) + width) % width
+const web3FormsAccessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY?.trim()
 
 const routeInfo = () => {
   const [path = 'home', query = ''] = window.location.hash
@@ -1019,47 +1020,70 @@ function ContactPage({ params }) {
     Facades: 'Architectural Facades',
   }
   const initialProjectType = projectTypeByCategory[params.get('category')] ?? ''
+  const [sending, setSending] = useState(false)
   const [status, setStatus] = useState(null)
 
-  function openEmailDraft(event) {
+  async function submitInquiry(event) {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const selectedFile = formData.get('attachment')
-    const attachmentNote =
-      selectedFile instanceof File && selectedFile.name
-        ? `\nSelected file (attach it manually in Gmail): ${selectedFile.name}`
-        : ''
-    const body = [
-      'Hello SPHYNX,',
-      '',
-      'I would like to request a quote. Here are my project details:',
-      '',
-      `Name: ${formData.get('firstName')} ${formData.get('lastName')}`,
-      `Email: ${formData.get('email')}`,
-      `Phone: ${formData.get('phone')}`,
-      `Company: ${formData.get('company') || 'Not provided'}`,
-      `Project type: ${formData.get('projectType')}`,
-      `Product of interest: ${formData.get('productInterest')}`,
-      `Project location: ${formData.get('location')}`,
-      `Estimated budget: ${formData.get('budget') || 'Not provided'}`,
-      '',
-      'Project description:',
-      formData.get('description'),
-      attachmentNote,
-    ].join('\n')
-    const subject = `SPHYNX quote request - ${formData.get('firstName')} ${formData.get('lastName')}`
-    const composeUrl = new URL('https://mail.google.com/mail/')
-    composeUrl.searchParams.set('view', 'cm')
-    composeUrl.searchParams.set('fs', '1')
-    composeUrl.searchParams.set('to', 'renzumendoza@gmail.com')
-    composeUrl.searchParams.set('su', subject)
-    composeUrl.searchParams.set('body', body)
+    if (!web3FormsAccessKey) {
+      setStatus({
+        type: 'error',
+        text: 'Quote requests are not configured yet. Add the Web3Forms access key to Vercel as VITE_WEB3FORMS_ACCESS_KEY, then redeploy.',
+      })
+      return
+    }
 
-    setStatus({
-      type: 'info',
-      text: 'Gmail is opening with your quote details. Sign in if prompted, review the message, then press Send. Attach any selected files manually.',
-    })
-    window.open(composeUrl.toString(), '_blank', 'noopener,noreferrer')
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    if (formData.get('botcheck')) return
+
+    const payload = Object.fromEntries(formData.entries())
+    payload.access_key = web3FormsAccessKey
+    payload.subject = `SPHYNX quote request - ${payload.firstName} ${payload.lastName}`
+    payload.from_name = 'SPHYNX Glass and Aluminum website'
+    payload.botcheck = ''
+
+    setSending(true)
+    setStatus(null)
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(20000),
+      })
+      const result = await response.json()
+      if (!response.ok || result.success !== true) {
+        throw new Error(
+          typeof result.message === 'string'
+            ? result.message
+            : 'The email service could not accept your request. Please try again later.',
+        )
+      }
+
+      setStatus({
+        type: 'success',
+        text: 'Your quote request has been sent. We’ll be in touch soon.',
+      })
+      form.reset()
+    } catch (error) {
+      console.error('Quote request could not be delivered:', error)
+      setStatus({
+        type: 'error',
+        text: error instanceof Error && error.name === 'TimeoutError'
+          ? 'The email service took too long to respond. Please try again in a moment.'
+          : error instanceof TypeError
+            ? 'Could not connect to the email service. Check your internet connection or try again later.'
+            : error instanceof Error
+              ? error.message
+              : 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
+      })
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -1091,7 +1115,7 @@ function ContactPage({ params }) {
             </p>
           </div>
         </div>
-        <form className="inquiry-form" onSubmit={openEmailDraft}>
+        <form className="inquiry-form" onSubmit={submitInquiry}>
           <div className="form-heading">
             <span className="eyebrow">Request a quote</span>
             <h2>Tell us about <em>your project.</em></h2>
@@ -1125,10 +1149,19 @@ function ContactPage({ params }) {
             <label>Estimated budget <span>(optional)</span><input name="budget" inputMode="text" /></label>
           </div>
           <label>Project description<textarea name="description" rows="5" required /></label>
-          <label>Attach a file or image <span>(optional; attach it manually in Gmail)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
+          <label className="honeypot" aria-hidden="true">
+            Leave this field empty
+            <input name="botcheck" tabIndex="-1" autoComplete="off" />
+          </label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
-          <button className="button button-dark form-submit" type="submit">
-            Open email to send <Arrow />
+          {!web3FormsAccessKey && (
+            <p className="endpoint-note">
+              Email delivery needs a Web3Forms access key. Add
+              {' '}<code>VITE_WEB3FORMS_ACCESS_KEY</code> in Vercel and redeploy to enable this form.
+            </p>
+          )}
+          <button className="button button-dark form-submit" type="submit" disabled={sending}>
+            {sending ? 'Sending…' : 'Request a quote'} <Arrow />
           </button>
         </form>
       </section>
