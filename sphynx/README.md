@@ -18,17 +18,11 @@ npm run build
 
 ## Quote request delivery
 
-The quote form posts to the Vercel serverless function at `/api/inquiries`. The function validates all fields, limits optional attachments to 3 MB, and sends the inquiry to `renzumendoza@gmail.com` through Resend. Resend credentials stay on the server and are never exposed to the browser.
+The quote form sends submissions to `renzumendoza@gmail.com` through FormSubmit's AJAX endpoint. No custom domain or API key is required. The optional attachment is limited to 3 MB. Form data is submitted directly to FormSubmit, a third-party service.
 
-To enable delivery:
+On the first submission, FormSubmit sends an activation message to the recipient address. Open that message and confirm the form; submissions will not be forwarded until activation is complete. Afterward, test the form and check the recipient inbox and spam folder.
 
-1. Create a Resend account and verify a domain you control. Set up the sender address you want to use on that domain.
-2. Create a Resend API key with permission to send email.
-3. In the Vercel project settings, add `RESEND_API_KEY` and `INQUIRY_FROM_EMAIL` (the verified sender address), then redeploy. Do not use a `VITE_` prefix for secrets.
-4. For local development, create `.env.local` from `.env.example`, fill in those values, and run `npx vercel dev` so the Vercel function is available locally.
-5. Submit a test quote and verify delivery in `renzumendoza@gmail.com` (including its spam folder). Enable Vercel Firewall rate limiting before making the public form widely available.
-
-The API uses a server-side fixed recipient, validates the email and required fields, and includes a honeypot spam check. It returns success only after Resend accepts the message. Resend requires a verified sender domain for reliable delivery.
+The form includes FormSubmit's honeypot field. Review FormSubmit's service terms and privacy practices before using the form for personal information.
 
 ## Routes
 

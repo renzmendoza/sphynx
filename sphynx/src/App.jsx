@@ -16,15 +16,6 @@ const brandSpeed = 32
 const wrapOffset = (value, width) => ((value % width) + width) % width
 const maxInquiryAttachmentSize = 3 * 1024 * 1024
 
-const encodeFile = async (file) => {
-  const bytes = new Uint8Array(await file.arrayBuffer())
-  let binary = ''
-  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000))
-  }
-  return btoa(binary)
-}
-
 const routeInfo = () => {
   const [path = 'home', query = ''] = window.location.hash
     .replace(/^#\/?/, '')
@@ -1037,7 +1028,7 @@ function ContactPage({ params }) {
     if (sending) return
     const form = event.currentTarget
     const formData = new FormData(form)
-    if (formData.get('website')) {
+    if (formData.get('_honey')) {
       setStatus({ type: 'error', text: 'Unable to submit this request. Please try again.' })
       return
     }
@@ -1053,21 +1044,15 @@ function ContactPage({ params }) {
     setSending(true)
     setStatus(null)
     try {
-      const payload = Object.fromEntries(
-        [...formData.entries()].filter(([name]) => name !== 'attachment'),
-      )
-      if (attachment instanceof File && attachment.size > 0) {
-        payload.attachment = {
-          name: attachment.name,
-          type: attachment.type,
-          content: await encodeFile(attachment),
-        }
-      }
-
-      const response = await fetch('/api/inquiries', {
+      const submission = new FormData(form)
+      const fullName = `${formData.get('firstName')} ${formData.get('lastName')}`.trim()
+      submission.set('_subject', `SPHYNX quote request - ${fullName}`)
+      submission.set('_replyto', String(formData.get('email') ?? ''))
+      submission.set('_template', 'table')
+      const response = await fetch('https://formsubmit.co/ajax/renzumendoza@gmail.com', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        headers: { Accept: 'application/json' },
+        body: submission,
       })
       let result
       try {
@@ -1075,19 +1060,17 @@ function ContactPage({ params }) {
       } catch {
         result = null
       }
-      if (!response.ok) {
+      if (!response.ok || ![true, 'true'].includes(result?.success)) {
         const message =
           typeof result?.message === 'string'
             ? result.message
-            : response.status === 404
-              ? 'The quote service is unavailable. Please deploy the site with its Vercel API function enabled.'
-              : `The quote service returned an unexpected response (${response.status}). Please try again later.`
+            : `The email form service returned an unexpected response (${response.status}). Please try again later.`
         throw new Error(message)
       }
-      if (typeof result?.message !== 'string') {
-        throw new Error('The quote service returned an invalid response. Please try again later.')
-      }
-      setStatus({ type: 'success', text: 'Thank you. Your quote request has been sent.' })
+      setStatus({
+        type: 'success',
+        text: 'Your request was submitted. If this is the first submission, check renzumendoza@gmail.com for FormSubmit’s activation email and confirm the form before requests can be delivered.',
+      })
       form.reset()
     } catch (error) {
       console.error('Quote request could not be delivered:', error)
@@ -1166,7 +1149,7 @@ function ContactPage({ params }) {
           </div>
           <label>Project description<textarea name="description" rows="5" required /></label>
           <label>Attach a file or image <span>(optional, max 3 MB)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
-          <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex="-1" autoComplete="off" /></label>
+          <label className="honeypot" aria-hidden="true">Website<input name="_honey" tabIndex="-1" autoComplete="off" /></label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
           <button className="button button-dark form-submit" type="submit" disabled={sending}>
             {sending ? 'Sending…' : 'Request a quote'} <Arrow />
