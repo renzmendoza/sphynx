@@ -18,11 +18,17 @@ npm run build
 
 ## Quote request delivery
 
-The inquiry form validates its fields in the browser and submits `multipart/form-data` to the URL configured by `VITE_INQUIRY_ENDPOINT`. The endpoint must accept the named form fields and optional `attachment`, deliver the inquiry to the designated company email, and return a successful HTTP status only after delivery. Configure the receiving email and any spam controls on that backend or form service; do not put email credentials or private keys in the frontend.
+The quote form posts to the Vercel serverless function at `/api/inquiries`. The function validates all fields, limits optional attachments to 3 MB, and sends the inquiry to `renzumendoza@gmail.com` through Resend. Resend credentials stay on the server and are never exposed to the browser.
 
-Copy `.env.example` to `.env.local` and set the endpoint URL. Without a configured endpoint, the form clearly reports that it cannot send and provides a link to the official SPHYNX website; it will not show a false success message.
+To enable delivery:
 
-The frontend includes a honeypot field as a basic spam signal. Production delivery should also apply server-side validation, upload limits and spam protection.
+1. Create a Resend account and verify a domain you control. Set up the sender address you want to use on that domain.
+2. Create a Resend API key with permission to send email.
+3. In the Vercel project settings, add `RESEND_API_KEY` and `INQUIRY_FROM_EMAIL` (the verified sender address), then redeploy. Do not use a `VITE_` prefix for secrets.
+4. For local development, create `.env.local` from `.env.example`, fill in those values, and run `npx vercel dev` so the Vercel function is available locally.
+5. Submit a test quote and verify delivery in `renzumendoza@gmail.com` (including its spam folder). Enable Vercel Firewall rate limiting before making the public form widely available.
+
+The API uses a server-side fixed recipient, validates the email and required fields, and includes a honeypot spam check. It returns success only after Resend accepts the message. Resend requires a verified sender domain for reliable delivery.
 
 ## Routes
 

@@ -42,59 +42,191 @@ export const products = [
 ]
 
 const makeProjects = (folder, category, files) =>
-  files.map((file) => ({
-    title: file
-      .replace(/\.[^.]+$/, '')
-      .replace(/[-_]+/g, ' ')
-      .replace(/\b\w/g, (letter) => letter.toUpperCase()),
-    image: `${folder}/${file}`,
-    category,
-  }))
+  files.map((project) => {
+    const file = typeof project === 'string' ? project : project.image
+    const title =
+      typeof project === 'string'
+        ? file
+            .replace(/\.[^.]+$/, '')
+            .replace(/[-_]+/g, ' ')
+            .replace(/\b\w/g, (letter) => letter.toUpperCase())
+        : project.title
+
+    return { title, image: `${folder}/${file}`, category }
+  })
 
 export const projects = [
   ...makeProjects('recent projects', 'Recent', [
-    '4-storey-batangas-hospital-project-sphynxglass-e1697968415809.jpg',
-    'ACE-Medical-Center-Sta-Maria-Bulacan.png',
-    'alabel-municipal-hall-sphynx-project.jpg',
-    'breeze-spa-sphynx-project-e1697968459550.jpg',
-    'Centuria-Medical-Center-sphynxglass-e1697968504103.jpg',
-    'Citymall-Dipolog.jpg',
-    'Citymall-Tuguegarao.jpg',
-    'Cotabato-Regional-and-Medical-Center.jpg',
-    'Cotabato-Regional-Blood-Center.jpg',
-    'Crown-Equities-Inc.png',
-    'DB-Schenker.jpg',
-    'Dunkin-Donuts.jpg',
-    'etching-projects.jpg',
-    'etching-projects2.jpg',
-    'kalayan-hospital-sphynx-project.jpg',
-    'late-hotel-tagaytay-sphynx-project-e1697968028119.jpg',
-    'Malabon-Medical-Center.jpg',
-    'Metro-Pacific-South-Hub.jpg',
-    'Municipality-of-Alabel.jpeg',
-    'okada-project-sphynx-glass-e1697968327570.jpg',
-    'Philam-life-bldg-sphynx-project3.jpg',
-    'Sannovex-Pharmaceuticals.jpg',
-    'shangrila-project-sphynxglass-e1697968441691.jpg',
-    'sphynx-glass-project-e1697968523725.jpg',
-    'sphynxglass-project-e1697968298175.jpg',
+    {
+      image: 'Centuria-Medical-Center-sphynxglass-e1697968504103.jpg',
+      title: 'Centuria Medical Center Sliding Doors',
+    },
+    {
+      image: 'ACE-Medical-Center-Sta-Maria-Bulacan.png',
+      title: 'ACE Medical Center, Sta. Maria Bulacan',
+    },
+    {
+      image: 'alabel-municipal-hall-sphynx-project.jpg',
+      title: 'Alabel Municipal Hall',
+    },
+    {
+      image: 'breeze-spa-sphynx-project-e1697968459550.jpg',
+      title: 'Breeze Spa Glass Work',
+    },
+    {
+      image: 'Citymall-Dipolog.jpg',
+      title: 'Citymall Dipolog',
+    },
+    {
+      image: 'Citymall-Tuguegarao.jpg',
+      title: 'Citymall Tuguegarao',
+    },
+    {
+      image: 'Cotabato-Regional-and-Medical-Center.jpg',
+      title: 'Cotabato Regional and Medical Center',
+    },
+    {
+      image: 'Cotabato-Regional-Blood-Center.jpg',
+      title: 'Cotabato Regional Blood Center',
+    },
+    {
+      image: 'Crown-Equities-Inc.png',
+      title: 'Crown Equities Inc',
+    },
+    {
+      image: 'DB-Schenker.jpg',
+      title: 'DB Schenker',
+    },
+    {
+      image: 'Dunkin-Donuts.jpg',
+      title: 'Dunkin Donuts, Cavite',
+    },
+    {
+      image: 'etching-projects.jpg',
+      title: 'Office Glass Projects',
+    },
+    {
+      image: 'etching-projects2.jpg',
+      title: 'Office Glass Projects',
+    },
+    {
+      image: 'kalayan-hospital-sphynx-project.jpg',
+      title: 'Kalayan Hospital',
+    },
+    {
+      image: 'late-hotel-tagaytay-sphynx-project-e1697968028119.jpg',
+      title: 'Lake Hotel, Tagaytay',
+    },
+    {
+      image: 'Malabon-Medical-Center.jpg',
+      title: 'Malabon Medical Center',
+    },
+    {
+      image: 'Metro-Pacific-South-Hub.jpg',
+      title: 'Metro Pacific South Hub',
+    },
+    {
+      image: 'Municipality-of-Alabel.jpeg',
+      title: 'Municipality of Alabel',
+    },
+    {
+      image: 'okada-project-sphynx-glass-e1697968327570.jpg',
+      title: 'Okada Glass Work',
+    },
+    {
+      image: 'Philam-life-bldg-sphynx-project3.jpg',
+      title: 'AIA Tower, Makati City',
+    },
+    {
+      image: 'Quezon City Hall glass canopy.jpg',
+      title: 'Quezon City Hall Glass Canopy',
+    },
+    {
+      image: 'Marinduque Provincial Hospital Boac Newly Renovated Building_v3.jpg',
+      title: 'Marinduque Provincial Hospital',
+    },
+    {
+      image: 'After Tree Dessert Cafe in SM Mall of Asia.jpg',
+      title: 'After Tree Dessert Cafe,SM Mall of Asia',
+    },
+    {
+      image: 'Sannovex-Pharmaceuticals.jpg',
+      title: 'Sannovex Pharmaceuticals',
+    },
+    {
+      image: 'shangrila-project-sphynxglass-e1697968441691.jpg',
+      title: 'The Rise, Makati City',
+    },
+    {
+      image: 'sphynx-glass-project-e1697968523725.jpg',
+      title: 'Alabel Municipal Hall',
+    },
+    {
+      image: 'sphynxglass-project-e1697968298175.jpg',
+      title: 'Glass Door Project',
+    },
   ]),
   ...makeProjects('finished projects', 'Finished', [
-    'ABB-Inc.-Project-2-e1697998276383.jpg',
-    'AIM-project-e1697997753245.jpg',
-    'Andoks-project.jpg',
-    'Asian-Tower-Project-e1697997510136.jpg',
-    'Assumption-college-project-e1697997778563.jpg',
-    'bangko-central-project-e1697997449612.webp',
-    'delasalle-project.jpg',
-    'glodies-coffe-shop-project-e1697997678674.jpg',
-    'Heritage-Park.jpg',
-    'Land-Registration-Authority-Project-e1697997583249.jpg',
-    'Malabon-3.png',
-    'maxs-project-e1697997707724.jpg',
-    'Philippine-Stock-Exchange-Glass-Project-1.jpg',
-    'red-ribbon-project.jpg',
-    'the-coffee-bean-shop.jpg',
+    {
+      image: 'ABB-Inc.-Project-2-e1697998276383.jpg',
+      title: 'ABB Inc. Project',
+    },
+    {
+      image: 'AIM-project-e1697997753245.jpg',
+      title: 'AIM Project',
+    },
+    {
+      image: 'Andoks-project.jpg',
+      title: 'Andoks Project',
+    },
+    {
+      image: 'Asian-Tower-Project-e1697997510136.jpg',
+      title: 'Asian Tower Project',
+    },
+    {
+      image: 'Assumption-college-project-e1697997778563.jpg',
+      title: 'Assumption College Project',
+    },
+    {
+      image: 'bangko-central-project-e1697997449612.webp',
+      title: 'Bangko Central Project',
+    },
+    {
+      image: 'delasalle-project.jpg',
+      title: 'De La Salle University Project',
+    },
+    {
+      image: 'glodies-coffe-shop-project-e1697997678674.jpg',
+      title: 'Goldies Coffee Shop Project',
+    },
+    {
+      image: 'Heritage-Park.jpg',
+      title: 'Heritage Park',
+    },
+    {
+      image: 'Land-Registration-Authority-Project-e1697997583249.jpg',
+      title: 'Land Registration Authority Project',
+    },
+    {
+      image: 'Malabon-3.png',
+      title: 'Malabon Project',
+    },
+    {
+      image: 'maxs-project-e1697997707724.jpg',
+      title: 'Max’s Restaurant, Cebu',
+    },
+    {
+      image: 'Philippine-Stock-Exchange-Glass-Project-1.jpg',
+      title: 'Philippine Stock Exchange Glass Project',
+    },
+    {
+      image: 'red-ribbon-project.jpg',
+      title: 'Red Ribbon Project',
+    },
+    {
+      image: 'the-coffee-bean-shop.jpg',
+      title: 'The Coffee Bean Shop',
+    },
   ]),
   ...makeProjects('residential projects', 'Residential', [
     '1.png',
@@ -165,6 +297,8 @@ export const brands = [
   ['Netopia.svg', 'Netopia'],
   ['PAF-1.svg', 'Philippine Air Force'],
   ['Red-Ribbon-1.svg', 'Red Ribbon'],
+  ['logo.png', 'Philippine Marina'],
+  ['After Tree Cafe logo.png', 'After Tree Cafe'],
   ['The-Heritage-Hotel-Manila-2-removebg-preview-1.png', 'The Heritage Hotel Manila'],
   ['The-Peninsula-Manila.svg', 'The Peninsula Manila'],
 ].map(([file, name]) => ({ image: `brands/${file}`, name }))

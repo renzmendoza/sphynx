@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { brands, capabilities, image, products, projects } from './siteData'
 import './App.css'
 
@@ -12,6 +12,18 @@ const projectFilters = [
   'Facades',
 ]
 const currentYear = new Date().getFullYear()
+const brandSpeed = 32
+const wrapOffset = (value, width) => ((value % width) + width) % width
+const maxInquiryAttachmentSize = 3 * 1024 * 1024
+
+const encodeFile = async (file) => {
+  const bytes = new Uint8Array(await file.arrayBuffer())
+  let binary = ''
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000))
+  }
+  return btoa(binary)
+}
 
 const routeInfo = () => {
   const [path = 'home', query = ''] = window.location.hash
@@ -150,7 +162,7 @@ function Header({ page }) {
       <div className="header-inner">
         <a className="brand-mark" href="#/" aria-label="Sphynx Glass and Aluminum home">
           <img
-            src={image('gold logo for navigation.png')}
+            src={image('sphynx navigation.png')}
             alt="Sphynx Glass and Aluminum"
             width="178"
             height="60"
@@ -307,7 +319,7 @@ function HomePage() {
       <section className="hero">
         <img
           className="hero-image"
-          src={image('architecture facades/architectural-glass-sphynxglass-e1697821702965.jpg')}
+          src={image('modern-glass-skyscraper-facade-against-clear-blue-sky.jpg')}
           alt=""
           fetchPriority="high"
         />
@@ -497,17 +509,180 @@ function HomePage() {
 }
 
 function BrandStrip() {
+  const marqueeRef = useRef(null)
+  const trackRef = useRef(null)
+  const sequenceRef = useRef(null)
+  const measureRef = useRef(() => {})
+  const sequenceWidth = useRef(0)
+  const viewportWidth = useRef(0)
+  const position = useRef(0)
+  const pointerStart = useRef({ x: 0, position: 0 })
+  const dragging = useRef(false)
+  const hovered = useRef(false)
+  const focused = useRef(false)
+  const paused = useRef(false)
+  const [copyCount, setCopyCount] = useState(2)
+
+  const pauseCarousel = () => {
+    const track = trackRef.current
+    const width = sequenceWidth.current
+    if (paused.current || !track || !width) return
+
+    const transform = getComputedStyle(track).transform
+    const translateX = transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m41
+    position.current = wrapOffset(-translateX, width)
+    track.classList.add('is-paused')
+    paused.current = true
+  }
+
+  const resumeCarousel = () => {
+    const track = trackRef.current
+    if (
+      !paused.current ||
+      !track ||
+      hovered.current ||
+      focused.current ||
+      dragging.current
+    ) return
+
+    track.style.animation = 'none'
+    void track.offsetWidth
+    track.style.animationDelay = `-${position.current / brandSpeed}s`
+    track.style.transform = ''
+    track.style.animation = ''
+    track.classList.remove('is-paused')
+    paused.current = false
+  }
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      const width = sequenceRef.current?.getBoundingClientRect().width ?? 0
+      const viewport = marqueeRef.current?.clientWidth ?? 0
+      if (!width || !viewport) return
+
+      const widthChanged = width !== sequenceWidth.current
+      const viewportChanged = viewport !== viewportWidth.current
+      if (!widthChanged && !viewportChanged) return
+      const wasAnimating = widthChanged && sequenceWidth.current > 0 && !paused.current
+      if (wasAnimating) pauseCarousel()
+
+      sequenceWidth.current = width
+      viewportWidth.current = viewport
+      position.current = wrapOffset(position.current, width)
+      if (widthChanged && trackRef.current) {
+        trackRef.current.style.setProperty('--brand-distance', `${-width}px`)
+        trackRef.current.style.setProperty('--brand-duration', `${width / brandSpeed}s`)
+        trackRef.current.classList.add('is-ready')
+        if (hovered.current || focused.current || dragging.current) pauseCarousel()
+        if (paused.current) {
+          trackRef.current.style.animation = 'none'
+          void trackRef.current.offsetWidth
+          trackRef.current.style.transform = `translate3d(${-position.current}px, 0, 0)`
+        }
+      }
+      setCopyCount(Math.max(2, Math.ceil(viewport / width) + 2))
+      if (wasAnimating) resumeCarousel()
+    }
+
+    measureRef.current = updateDimensions
+    updateDimensions()
+
+    const observer = new ResizeObserver(updateDimensions)
+    if (marqueeRef.current) observer.observe(marqueeRef.current)
+    if (sequenceRef.current) observer.observe(sequenceRef.current)
+    window.addEventListener('resize', updateDimensions)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', updateDimensions)
+    }
+  }, [])
+
+  const finishDragging = () => {
+    if (!dragging.current) return
+    dragging.current = false
+    resumeCarousel()
+  }
+
+  const handlePointerDown = (event) => {
+    if (event.button !== 0 || !sequenceWidth.current) return
+    pauseCarousel()
+    dragging.current = true
+    if (trackRef.current) {
+      trackRef.current.style.animation = 'none'
+      void trackRef.current.offsetWidth
+      trackRef.current.style.transform = `translate3d(${-position.current}px, 0, 0)`
+    }
+    pointerStart.current = { x: event.clientX, position: position.current }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.preventDefault()
+  }
+
   return (
     <section className="brands-section">
       <div className="page-width brands-heading">
         <span className="eyebrow">A few familiar names</span>
         <h2>Trusted by industry leaders.</h2>
       </div>
-      <div className="brand-marquee" aria-label="Client and partner logos">
-        <div className="brand-track">
-          {[...brands, ...brands].map((brand, index) => (
-            <div className="brand-logo-container" key={`${brand.name}-${index}`} aria-hidden={index >= brands.length}>
-              <img src={image(brand.image)} alt={index >= brands.length ? '' : brand.name} loading="lazy" />
+      <div
+        aria-label="Client and partner logos"
+        aria-roledescription="carousel"
+        className="brand-marquee"
+        onBlur={(event) => {
+          focused.current = event.currentTarget.contains(event.relatedTarget)
+          if (focused.current || hovered.current || dragging.current) pauseCarousel()
+          else resumeCarousel()
+        }}
+        onFocus={() => {
+          focused.current = true
+          pauseCarousel()
+        }}
+        onMouseEnter={() => {
+          hovered.current = true
+          pauseCarousel()
+        }}
+        onMouseLeave={() => {
+          hovered.current = false
+          resumeCarousel()
+        }}
+        onPointerCancel={finishDragging}
+        onPointerDown={handlePointerDown}
+        onPointerMove={(event) => {
+          if (!dragging.current) return
+          const width = sequenceWidth.current
+          position.current =
+            wrapOffset(
+              pointerStart.current.position -
+                (event.clientX - pointerStart.current.x),
+              width,
+            )
+          if (trackRef.current) {
+            trackRef.current.style.transform = `translate3d(${-position.current}px, 0, 0)`
+          }
+        }}
+        onPointerUp={finishDragging}
+        ref={marqueeRef}
+        role="region"
+        tabIndex={0}
+      >
+        <div className="brand-track" ref={trackRef}>
+          {Array.from({ length: copyCount }, (_, copyIndex) => (
+            <div
+              aria-hidden={copyIndex > 0}
+              className="brand-sequence"
+              key={copyIndex}
+              ref={copyIndex === 0 ? sequenceRef : null}
+            >
+              {brands.map((brand) => (
+                <div className="brand-logo-container" key={brand.name}>
+                  <img
+                    alt={copyIndex === 0 ? brand.name : ''}
+                    draggable="false"
+                    onLoad={() => measureRef.current()}
+                    src={image(brand.image)}
+                  />
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -718,8 +893,16 @@ function AboutPage() {
       />
       <section className="about-story page-width section-pad">
         <div className="about-story-image">
-          <img src={image(capabilities[0].image)} alt="Glass tempering capability" />
-          <span>Craft, capability, care.</span>
+          <video
+            aria-label="SPHYNX Glass and Aluminum company video"
+            controls
+            playsInline
+            poster={image(capabilities[0].image)}
+            preload="metadata"
+          >
+            <source src="/pics/Sphynx%20Video.mp4" type="video/mp4" />
+            Your browser does not support HTML video. Please use a browser that supports MP4 playback.
+          </video>
         </div>
         <div className="about-story-copy">
           <span className="eyebrow">Our approach</span>
@@ -763,14 +946,16 @@ function AboutPage() {
                 <li>Reduced solar heat</li>
                 <li>Improved energy efficiency</li>
               </ul>
-              <h4>Glass production equipment</h4>
-              <ul className="equipment-list">
-                <li>Tempered glass production line</li>
-                <li>Automatic insulated glass unit (IGU) production line</li>
-                <li>Bent tempered glass production line</li>
-                <li>Double-edge machine</li>
-                <li>Horizontal edge grinding and cleaning line</li>
-              </ul>
+              <details className="equipment-details">
+                <summary>Glass production equipment</summary>
+                <ul className="equipment-list">
+                  <li>Tempered glass production line</li>
+                  <li>Automatic insulated glass unit (IGU) production line</li>
+                  <li>Bent tempered glass production line</li>
+                  <li>Double-edge machine</li>
+                  <li>Horizontal edge grinding and cleaning line</li>
+                </ul>
+              </details>
             </article>
             <article className="about-service-card">
               <img
@@ -844,7 +1029,6 @@ function ContactPage({ params }) {
     Facades: 'Architectural Facades',
   }
   const initialProjectType = projectTypeByCategory[params.get('category')] ?? ''
-  const endpoint = import.meta.env.VITE_INQUIRY_ENDPOINT?.trim()
   const [sending, setSending] = useState(false)
   const [status, setStatus] = useState(null)
 
@@ -857,17 +1041,34 @@ function ContactPage({ params }) {
       setStatus({ type: 'error', text: 'Unable to submit this request. Please try again.' })
       return
     }
-    if (!endpoint) {
+    const attachment = formData.get('attachment')
+    if (attachment instanceof File && attachment.size > maxInquiryAttachmentSize) {
       setStatus({
         type: 'error',
-        text: 'Quote requests are not connected yet. Please visit the official SPHYNX website to get in touch.',
+        text: 'Attachments must be 3 MB or smaller. Please choose a smaller file and try again.',
       })
       return
     }
+
     setSending(true)
     setStatus(null)
     try {
-      const response = await fetch(endpoint, { method: 'POST', body: formData })
+      const payload = Object.fromEntries(
+        [...formData.entries()].filter(([name]) => name !== 'attachment'),
+      )
+      if (attachment instanceof File && attachment.size > 0) {
+        payload.attachment = {
+          name: attachment.name,
+          type: attachment.type,
+          content: await encodeFile(attachment),
+        }
+      }
+
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
       if (!response.ok) throw new Error(`Inquiry endpoint returned ${response.status}`)
       setStatus({ type: 'success', text: 'Thank you. Your quote request has been sent.' })
       form.reset()
@@ -945,10 +1146,9 @@ function ContactPage({ params }) {
             <label>Estimated budget <span>(optional)</span><input name="budget" inputMode="text" /></label>
           </div>
           <label>Project description<textarea name="description" rows="5" required /></label>
-          <label>Attach a file or image <span>(optional)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
+          <label>Attach a file or image <span>(optional, max 3 MB)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
           <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex="-1" autoComplete="off" /></label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
-          {!endpoint && <p className="endpoint-note">Inquiry delivery needs to be configured before this form can send. Please contact SPHYNX using the office information on this page.</p>}
           <button className="button button-dark form-submit" type="submit" disabled={sending}>
             {sending ? 'Sending…' : 'Request a quote'} <Arrow />
           </button>

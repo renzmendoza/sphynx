@@ -831,32 +831,43 @@ button:hover .arrow-icon {
 }
 
 .brand-marquee {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
 }
 
-.brand-marquee::-webkit-scrollbar {
-  display: none;
+.brand-marquee:active {
+  cursor: grabbing;
 }
 
 .brand-track {
   display: flex;
   width: max-content;
   align-items: center;
-  gap: 20px;
-  animation: marquee 42s linear infinite;
+  will-change: transform;
+  animation: brand-marquee var(--brand-duration, 42s) linear infinite;
 }
 
-.brand-track::after {
-  flex: 0 0 0;
-  content: '';
-}
-
-.brand-marquee:hover .brand-track,
-.brand-marquee:active .brand-track {
+.brand-track.is-paused {
   animation-play-state: paused;
+}
+
+.brand-track:not(.is-ready) {
+  animation-play-state: paused;
+}
+
+.brand-sequence {
+  display: flex;
+  width: max-content;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 20px;
+  padding-right: 20px;
+}
+
+@keyframes brand-marquee {
+  to { transform: translate3d(var(--brand-distance, -50%), 0, 0); }
 }
 
 .brand-logo-container {
@@ -883,10 +894,6 @@ button:hover .arrow-icon {
 .brand-logo-container:hover img {
   filter: grayscale(0);
   opacity: 1;
-}
-
-@keyframes marquee {
-  to { transform: translateX(-50%); }
 }
 
 @keyframes dropdown-in {
@@ -1447,25 +1454,23 @@ button:hover .arrow-icon {
 
 .about-story-image {
   position: relative;
-  height: 430px;
+  min-width: 0;
+  height: auto;
+  padding: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(164, 125, 43, .58);
+  border-radius: 4px;
+  background: #22231f;
 }
 
-.about-story-image img {
+.about-story-image video {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.about-story-image > span {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  padding: 13px 17px;
-  color: var(--ink);
-  background: var(--gold);
-  font-size: 10px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  height: auto;
+  aspect-ratio: auto 16 / 9;
+  border-radius: 2px;
+  background: #111;
+  object-fit: contain;
 }
 
 .about-story-copy h2 {
@@ -1495,66 +1500,49 @@ button:hover .arrow-icon {
 
 .about-service-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 42px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 34px;
 }
 
 .about-service-card {
   min-width: 0;
-  padding: 0 0 30px;
+  padding: 0 0 22px;
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--paper);
 }
 
 .about-service-card > :not(.about-service-image) {
-  margin-right: clamp(24px, 3vw, 38px);
-  margin-left: clamp(24px, 3vw, 38px);
+  margin-right: 22px;
+  margin-left: 22px;
 }
 
 .about-service-image {
   display: block;
   width: 100%;
-  height: clamp(190px, 26vw, 300px);
-  margin-bottom: 26px;
+  height: clamp(150px, 16vw, 205px);
+  margin-bottom: 20px;
   object-fit: cover;
   object-position: center;
   background: #deddd5;
 }
 
-.glass-supply-card .about-service-image {
-  height: clamp(240px, 34vw, 390px);
-  object-position: center 45%;
-}
-
 .about-service-card > .eyebrow {
   margin-top: 0;
+  font-size: 9px;
 }
 
 .about-service-card > h3 {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .about-service-card > p {
-  margin-top: 14px;
-}
-
-.about-service-card > h4 {
-  margin-top: 24px;
-}
-
-.about-service-card > .service-benefits,
-.about-service-card > .equipment-list {
-  margin-top: 16px;
-}
-
-.glass-supply-card {
-  grid-column: 1 / -1;
+  margin-top: 11px;
 }
 
 .about-service-card h3 {
-  font-size: clamp(23px, 2.4vw, 32px);
+  font-size: clamp(20px, 1.8vw, 25px);
   line-height: 1.25;
 }
 
@@ -1564,23 +1552,32 @@ button:hover .arrow-icon {
 }
 
 .about-service-card p {
-  max-width: 760px;
+  max-width: none;
   color: var(--muted);
-  line-height: 1.75;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
-.about-service-card h4 {
+.equipment-details {
+  margin: 18px 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.equipment-details summary {
+  padding-block: 12px 2px;
+  color: var(--ink);
+  cursor: pointer;
   font-family: var(--heading);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .service-benefits,
 .equipment-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 24px;
-  margin: 16px 0 0;
+  grid-template-columns: 1fr;
+  gap: 7px;
+  margin: 12px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -1590,7 +1587,7 @@ button:hover .arrow-icon {
   position: relative;
   padding-left: 17px;
   color: #55544e;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -1987,6 +1984,10 @@ button:hover .arrow-icon {
 @media (max-width: 1020px) {
   .page-width {
     width: calc(100% - 52px);
+  }
+
+  .about-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .brand-logo-container {
@@ -2503,17 +2504,18 @@ button:hover .arrow-icon {
     margin-top: 30px;
   }
 
-  .glass-supply-card {
-    grid-column: auto;
+  .about-service-card > :not(.about-service-image) {
+    margin-right: 20px;
+    margin-left: 20px;
   }
 
-  .service-benefits,
-  .equipment-list {
-    grid-template-columns: 1fr;
+  .about-service-image {
+    height: clamp(175px, 55vw, 245px);
   }
 
-  .about-story-image {
-    height: 340px;
+  .equipment-details {
+    margin-right: 20px;
+    margin-left: 20px;
   }
 
   .vision-section {
