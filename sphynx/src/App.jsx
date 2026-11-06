@@ -1049,10 +1049,27 @@ function ContactPage({ params }) {
       submission.set('_subject', `SPHYNX quote request - ${fullName}`)
       submission.set('_replyto', String(formData.get('email') ?? ''))
       submission.set('_template', 'table')
+      let requestOptions
+      if (attachment instanceof File && attachment.size > 0) {
+        requestOptions = {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: submission,
+        }
+      } else {
+        submission.delete('attachment')
+        requestOptions = {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(Object.fromEntries(submission.entries())),
+        }
+      }
       const response = await fetch('https://formsubmit.co/ajax/renzumendoza@gmail.com', {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: submission,
+        ...requestOptions,
+        signal: AbortSignal.timeout(20000),
       })
       let result
       try {
@@ -1076,9 +1093,13 @@ function ContactPage({ params }) {
       console.error('Quote request could not be delivered:', error)
       setStatus({
         type: 'error',
-        text: error instanceof Error
-          ? error.message
-          : 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
+        text: error instanceof Error && error.name === 'TimeoutError'
+          ? 'The email service took too long to respond. Please try again in a moment.'
+          : error instanceof TypeError
+            ? 'Could not connect to the email service. Check your internet connection or try again later.'
+            : error instanceof Error
+              ? error.message
+              : 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
       })
     } finally {
       setSending(false)
