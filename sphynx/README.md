@@ -18,7 +18,7 @@ npm run build
 
 ## Quote request delivery
 
-The quote form opens a prefilled email draft addressed to `renzumendoza@gmail.com` using the visitor's default email app. No backend, email service account, or API key is required. Visitors must review and send the draft themselves. Browsers cannot attach a selected file through a `mailto:` link, so the form reminds visitors to attach it manually in their email app.
+The quote form opens a prefilled Gmail compose window addressed to `renzumendoza@gmail.com`. No backend, email service account, or API key is required. Visitors must be signed in to Gmail, review the draft, and send it themselves. Browsers cannot attach a selected file through a compose link, so the form reminds visitors to attach it manually in Gmail.
 
 ## Routes
 

@@ -1027,7 +1027,7 @@ function ContactPage({ params }) {
     const selectedFile = formData.get('attachment')
     const attachmentNote =
       selectedFile instanceof File && selectedFile.name
-        ? `\nSelected file (attach it manually in your email app): ${selectedFile.name}`
+        ? `\nSelected file (attach it manually in Gmail): ${selectedFile.name}`
         : ''
     const body = [
       'Hello SPHYNX,',
@@ -1048,12 +1048,18 @@ function ContactPage({ params }) {
       attachmentNote,
     ].join('\n')
     const subject = `SPHYNX quote request - ${formData.get('firstName')} ${formData.get('lastName')}`
+    const composeUrl = new URL('https://mail.google.com/mail/')
+    composeUrl.searchParams.set('view', 'cm')
+    composeUrl.searchParams.set('fs', '1')
+    composeUrl.searchParams.set('to', 'renzumendoza@gmail.com')
+    composeUrl.searchParams.set('su', subject)
+    composeUrl.searchParams.set('body', body)
 
     setStatus({
       type: 'info',
-      text: 'Your email app should open with the quote details filled in. Review the message and press Send. Attach any selected files manually.',
+      text: 'Gmail is opening with your quote details. Sign in if prompted, review the message, then press Send. Attach any selected files manually.',
     })
-    window.location.href = `mailto:renzumendoza@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.open(composeUrl.toString(), '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -1119,7 +1125,7 @@ function ContactPage({ params }) {
             <label>Estimated budget <span>(optional)</span><input name="budget" inputMode="text" /></label>
           </div>
           <label>Project description<textarea name="description" rows="5" required /></label>
-          <label>Attach a file or image <span>(optional; attach it manually in your email app)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
+          <label>Attach a file or image <span>(optional; attach it manually in Gmail)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
           <button className="button button-dark form-submit" type="submit">
             Open email to send <Arrow />
