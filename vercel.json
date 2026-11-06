@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm --prefix sphynx ci",
+  "buildCommand": "npm --prefix sphynx run build",
+  "outputDirectory": "sphynx/dist"
+}
