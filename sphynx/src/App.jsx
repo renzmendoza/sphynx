@@ -1020,89 +1020,30 @@ function ContactPage({ params }) {
     Facades: 'Architectural Facades',
   }
   const initialProjectType = projectTypeByCategory[params.get('category')] ?? ''
-  const [sending, setSending] = useState(false)
-  const [status, setStatus] = useState(null)
+  const [status, setStatus] = useState(
+    params.get('submitted') === '1'
+      ? {
+          type: 'success',
+          text: 'Your request was submitted. If this was your first submission, check renzumendoza@gmail.com for FormSubmit’s activation email and confirm the form.',
+        }
+      : null,
+  )
 
-  async function submitInquiry(event) {
-    event.preventDefault()
-    if (sending) return
-    const form = event.currentTarget
-    const formData = new FormData(form)
+  function validateInquiry(event) {
+    const formData = new FormData(event.currentTarget)
     if (formData.get('_honey')) {
+      event.preventDefault()
       setStatus({ type: 'error', text: 'Unable to submit this request. Please try again.' })
       return
     }
     const attachment = formData.get('attachment')
     if (attachment instanceof File && attachment.size > maxInquiryAttachmentSize) {
+      event.preventDefault()
       setStatus({
         type: 'error',
         text: 'Attachments must be 3 MB or smaller. Please choose a smaller file and try again.',
       })
       return
-    }
-
-    setSending(true)
-    setStatus(null)
-    try {
-      const submission = new FormData(form)
-      const fullName = `${formData.get('firstName')} ${formData.get('lastName')}`.trim()
-      submission.set('_subject', `SPHYNX quote request - ${fullName}`)
-      submission.set('_replyto', String(formData.get('email') ?? ''))
-      submission.set('_template', 'table')
-      let requestOptions
-      if (attachment instanceof File && attachment.size > 0) {
-        requestOptions = {
-          method: 'POST',
-          headers: { Accept: 'application/json' },
-          body: submission,
-        }
-      } else {
-        submission.delete('attachment')
-        requestOptions = {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(Object.fromEntries(submission.entries())),
-        }
-      }
-      const response = await fetch('https://formsubmit.co/ajax/renzumendoza@gmail.com', {
-        ...requestOptions,
-        signal: AbortSignal.timeout(20000),
-      })
-      let result
-      try {
-        result = await response.json()
-      } catch {
-        result = null
-      }
-      if (!response.ok || ![true, 'true'].includes(result?.success)) {
-        const message =
-          typeof result?.message === 'string'
-            ? result.message
-            : `The email form service returned an unexpected response (${response.status}). Please try again later.`
-        throw new Error(message)
-      }
-      setStatus({
-        type: 'success',
-        text: 'Your request was submitted. If this is the first submission, check renzumendoza@gmail.com for FormSubmit’s activation email and confirm the form before requests can be delivered.',
-      })
-      form.reset()
-    } catch (error) {
-      console.error('Quote request could not be delivered:', error)
-      setStatus({
-        type: 'error',
-        text: error instanceof Error && error.name === 'TimeoutError'
-          ? 'The email service took too long to respond. Please try again in a moment.'
-          : error instanceof TypeError
-            ? 'Could not connect to the email service. Check your internet connection or try again later.'
-            : error instanceof Error
-              ? error.message
-              : 'We could not deliver your request just now. Please try again later or contact SPHYNX using the contact information on this page.',
-      })
-    } finally {
-      setSending(false)
     }
   }
 
@@ -1135,7 +1076,16 @@ function ContactPage({ params }) {
             </p>
           </div>
         </div>
-        <form className="inquiry-form" onSubmit={submitInquiry}>
+        <form
+          action="https://formsubmit.co/renzumendoza@gmail.com"
+          className="inquiry-form"
+          encType="multipart/form-data"
+          method="POST"
+          onSubmit={validateInquiry}
+        >
+          <input name="_next" type="hidden" value={`${window.location.origin}/#/contact?submitted=1`} />
+          <input name="_subject" type="hidden" value="New SPHYNX quote request" />
+          <input name="_template" type="hidden" value="table" />
           <div className="form-heading">
             <span className="eyebrow">Request a quote</span>
             <h2>Tell us about <em>your project.</em></h2>
@@ -1145,7 +1095,7 @@ function ContactPage({ params }) {
             <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
           </div>
           <div className="form-row">
-            <label>Email address<input name="email" type="email" autoComplete="email" required /></label>
+            <label>Email address<input name="_replyto" type="email" autoComplete="email" required /></label>
             <label>Phone number<input name="phone" type="tel" autoComplete="tel" pattern="[+0-9 ]{7,20}" title="Enter a valid phone number using digits, spaces, and an optional plus sign" required /></label>
           </div>
           <label>Company name <span>(optional)</span><input name="company" autoComplete="organization" /></label>
@@ -1172,8 +1122,8 @@ function ContactPage({ params }) {
           <label>Attach a file or image <span>(optional, max 3 MB)</span><input className="file-input" name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" /></label>
           <label className="honeypot" aria-hidden="true">Website<input name="_honey" tabIndex="-1" autoComplete="off" /></label>
           {status && <p className={`form-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}>{status.text}</p>}
-          <button className="button button-dark form-submit" type="submit" disabled={sending}>
-            {sending ? 'Sending…' : 'Request a quote'} <Arrow />
+          <button className="button button-dark form-submit" type="submit">
+            Request a quote <Arrow />
           </button>
         </form>
       </section>
