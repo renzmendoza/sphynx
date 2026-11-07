@@ -1009,7 +1009,7 @@ button:hover .arrow-icon {
 .photo-intro {
   position: relative;
   isolation: isolate;
-  padding-block: clamp(92px, 11vw, 142px) clamp(72px, 8vw, 102px);
+  padding-block: clamp(54px, 6vw, 78px) clamp(44px, 5vw, 64px);
   border-bottom: 0;
   color: #fff;
 }
@@ -1060,6 +1060,8 @@ button:hover .arrow-icon {
 }
 
 .page-intro.photo-intro h1 {
+  max-width: 1000px;
+  font-size: clamp(40px, 4.6vw, 58px);
   color: #fff;
   font-weight: 600;
   text-shadow: 0 2px 18px rgba(0, 0, 0, .28);
@@ -1744,7 +1746,7 @@ button:hover .arrow-icon {
 }
 
 .contact-intro {
-  padding-block: clamp(92px, 11vw, 142px) clamp(72px, 8vw, 102px);
+  padding-block: clamp(54px, 6vw, 78px) clamp(44px, 5vw, 64px);
 }
 
 .contact-intro::before {
@@ -2517,7 +2519,7 @@ button:hover .arrow-icon {
   }
 
   .photo-intro {
-    padding-block: 78px 58px;
+    padding-block: 48px 40px;
   }
 
   .about-intro::before {
@@ -2537,7 +2539,7 @@ button:hover .arrow-icon {
   }
 
   .contact-intro {
-    padding-block: 78px 58px;
+    padding-block: 48px 40px;
   }
 
   .contact-intro::before {
@@ -2546,6 +2548,10 @@ button:hover .arrow-icon {
 
   .page-intro h1 {
     font-size: clamp(49px, 11vw, 74px);
+  }
+
+  .page-intro.photo-intro h1 {
+    font-size: clamp(34px, 8.5vw, 42px);
   }
 
   .catalog-grid {
