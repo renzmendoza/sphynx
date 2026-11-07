@@ -698,6 +698,7 @@ function ProductsPage() {
       <PageIntro
         label="Products / Systems"
         title={<>Built around <em>the view.</em></>}
+        className="products-intro photo-intro"
         copy="A considered selection of glass and aluminum systems for architectural and commercial projects."
       />
       <section className="catalog-grid page-width">
@@ -831,6 +832,7 @@ function ProjectsPage({ initialCategory }) {
       <PageIntro
         label="Projects / Portfolio"
         title={<>Made to last. <em>Made to matter.</em></>}
+        className="projects-intro photo-intro"
         copy="A look at selected residential, commercial and architectural projects from the SPHYNX portfolio."
       />
       <section className="gallery-section page-width">
@@ -880,6 +882,7 @@ function AboutPage() {
       <PageIntro
         label="About Sphynx"
         title={<>Expertise you <em>can build on.</em></>}
+        className="about-intro photo-intro"
         copy="SPHYNX Glass and Aluminum is a solutions provider for residential, commercial, industrial and government projects."
       />
       <section className="about-story page-width section-pad">
@@ -1091,7 +1094,7 @@ function ContactPage({ params }) {
       <PageIntro
         label="Contact / Get a quote"
         title={<>Let's work <em>TOGETHER.</em></>}
-        className="contact-intro"
+        className="contact-intro photo-intro"
         copy="Tell us a little about your project and our team can help you explore the right solution."
       />
       <section className="contact-layout page-width">
@@ -1113,6 +1116,20 @@ function ContactPage({ params }) {
               <span><i aria-hidden="true" className="bi bi-calendar-week" /> Monday to Friday</span>
               <span><i aria-hidden="true" className="bi bi-clock" /> 8:00 AM – 5:00 PM</span>
             </p>
+          </div>
+          <div className="office-block contact-social">
+            <span>FOLLOW SPHYNX</span>
+            <a
+              aria-label="Visit SPHYNX on Facebook"
+              className="contact-facebook-link"
+              href="https://www.facebook.com/sphynxglassph"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <i aria-hidden="true" className="bi bi-facebook" />
+              <span>Follow us on Facebook</span>
+              <Arrow diagonal />
+            </a>
           </div>
         </div>
         <form className="inquiry-form" onSubmit={submitInquiry}>
@@ -1207,6 +1224,15 @@ function Footer() {
         </div>
         <div className="footer-links">
           <span>Get in touch</span><a href="#/contact">Request a quote</a><p>Monday to Friday<br />8:00 AM – 5:00 PM</p>
+          <a
+            aria-label="Visit SPHYNX on Facebook"
+            className="footer-facebook-link"
+            href="https://www.facebook.com/sphynxglassph"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <i aria-hidden="true" className="bi bi-facebook" /> Facebook
+          </a>
         </div>
       </div>
       <div className="page-width footer-bottom"><span>© {currentYear} SPHYNX Glass and Aluminum</span><span>Engineering glass. Defining spaces.</span></div>

@@ -1006,6 +1006,69 @@ button:hover .arrow-icon {
   border-bottom: 1px solid var(--line);
 }
 
+.photo-intro {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(92px, 11vw, 142px) clamp(72px, 8vw, 102px);
+  border-bottom: 0;
+  color: #fff;
+}
+
+.photo-intro::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  left: calc((100vw - 100%) / -2);
+  width: 100vw;
+  background-position: center;
+  background-size: cover;
+  content: '';
+}
+
+.about-intro::before {
+  background-image:
+    linear-gradient(90deg, rgba(18, 19, 17, .62), rgba(18, 19, 17, .34)),
+    url('/pics/background%20header%20for%20about.png');
+  background-position: center 52%;
+}
+
+.projects-intro::before {
+  background-image:
+    linear-gradient(90deg, rgba(18, 19, 17, .62), rgba(18, 19, 17, .34)),
+    url('/pics/background%20header%20for%20projects.jpg');
+  background-position: center 55%;
+}
+
+.products-intro::before {
+  background-image:
+    linear-gradient(90deg, rgba(18, 19, 17, .62), rgba(18, 19, 17, .34)),
+    url('/pics/background%20header%20for%20products.jpg');
+  background-position: center 52%;
+}
+
+.page-intro.photo-intro .eyebrow {
+  color: var(--gold-light);
+}
+
+.page-intro.photo-intro h1 em {
+  color: var(--gold-light);
+}
+
+.page-intro.photo-intro > p {
+  color: rgba(255, 255, 255, .86);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .28);
+}
+
+.page-intro.photo-intro h1 {
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .28);
+}
+
+.page-intro.photo-intro h1 em {
+  font-weight: 400;
+}
+
 .page-intro h1 {
   margin-top: 17px;
   font-size: clamp(50px, 7vw, 86px);
@@ -1681,7 +1744,14 @@ button:hover .arrow-icon {
 }
 
 .contact-intro {
-  padding-block: 76px 28px;
+  padding-block: clamp(92px, 11vw, 142px) clamp(72px, 8vw, 102px);
+}
+
+.contact-intro::before {
+  background-image:
+    linear-gradient(90deg, rgba(18, 19, 17, .62), rgba(18, 19, 17, .34)),
+    url('/pics/background%20for%20contact%20section.jpg');
+  background-position: center 54%;
 }
 
 .contact-details {
@@ -1754,6 +1824,43 @@ button:hover .arrow-icon {
 
 .office-hours {
   padding-top: 24px;
+}
+
+.contact-facebook-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color .2s ease, color .2s ease;
+}
+
+.office-block a.contact-facebook-link {
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.contact-facebook-link .bi {
+  color: #a47d2b;
+  font-size: 16px;
+}
+
+.contact-facebook-link .arrow-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.contact-facebook-link:hover {
+  border-color: #a47d2b;
+  color: #8a6824;
 }
 
 .inquiry-form {
@@ -1965,6 +2072,22 @@ button:hover .arrow-icon {
   vertical-align: middle;
 }
 
+.footer-links .footer-facebook-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold-light);
+}
+
+.footer-facebook-link .bi {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.footer-links .footer-facebook-link:hover {
+  color: #fff;
+}
+
 .footer-bottom {
   display: flex;
   min-height: 58px;
@@ -1990,6 +2113,22 @@ button:hover .arrow-icon {
 @media (max-width: 1020px) {
   .page-width {
     width: calc(100% - 52px);
+  }
+
+  .about-intro::before {
+    background-position: 58% center;
+  }
+
+  .contact-intro::before {
+    background-position: 62% center;
+  }
+
+  .projects-intro::before {
+    background-position: 62% center;
+  }
+
+  .products-intro::before {
+    background-position: 56% center;
   }
 
   .about-service-grid {
@@ -2071,6 +2210,10 @@ button:hover .arrow-icon {
 
   .contact-details > .office-hours {
     order: 6;
+  }
+
+  .contact-details > .contact-social {
+    order: 7;
   }
 
   .contact-layout > .inquiry-form {
@@ -2373,8 +2516,32 @@ button:hover .arrow-icon {
     padding-block: 72px 52px;
   }
 
+  .photo-intro {
+    padding-block: 78px 58px;
+  }
+
+  .about-intro::before {
+    background-position: 58% center;
+  }
+
+  .contact-intro::before {
+    background-position: 62% center;
+  }
+
+  .projects-intro::before {
+    background-position: 62% center;
+  }
+
+  .products-intro::before {
+    background-position: 56% center;
+  }
+
   .contact-intro {
-    padding-block: 62px 24px;
+    padding-block: 78px 58px;
+  }
+
+  .contact-intro::before {
+    background-position: 66% center;
   }
 
   .page-intro h1 {

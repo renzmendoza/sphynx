@@ -241,17 +241,38 @@ export const projects = [
     '11.png',
   ]),
   ...makeProjects('commercial projects', 'Commercial', [
-    'Automatic-slidingdoor-sphynxglass-1.jpg',
-    'window-blinds-sphynxglass-e1697871387165.webp',
+    {
+      image: 'Automatic-slidingdoor-sphynxglass-1.jpg',
+      title: 'Automatic Sliding Door',
+    },
+    {
+      image: 'window-blinds-sphynxglass-e1697871387165.webp',
+      title: 'Window Blinds',
+    },
   ]),
   ...makeProjects('custom glass creation', 'Custom Glass', [
-    'polymeric-etching2-window-sphynxglass-e1697870719704.jpg',
-    'table-glass-sphynxglass-e1697871777395.jpg',
-    'unique-mirrors-sphynxglass-e1697870963730.jpg',
+    {
+      image: 'polymeric-etching2-window-sphynxglass-e1697870719704.jpg',
+      title: 'Polymeric Etching',
+    },
+    {
+      image: 'table-glass-sphynxglass-e1697871777395.jpg',
+      title: 'Table Glass',
+    },
+    {
+      image: 'unique-mirrors-sphynxglass-e1697870963730.jpg',
+      title: 'Unique Mirrors',
+    },
   ]),
   ...makeProjects('architecture facades', 'Facades', [
-    'architectural-glass-sphynxglass-e1697821702965.jpg',
-    'spider_glazing_glass-sphynxglass-e1697871185694.jpg',
+    {
+      image: 'architectural-glass-sphynxglass-e1697821702965.jpg',
+      title: 'Architectural Glass',
+    },
+    {
+      image: 'spider_glazing_glass-sphynxglass-e1697871185694.jpg',
+      title: 'Spider Glazing Glass',
+    },
   ]),
 ]
 
