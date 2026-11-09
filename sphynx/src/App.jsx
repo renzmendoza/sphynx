@@ -1,15 +1,45 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { brands, capabilities, image, products, projects } from './siteData'
+import {
+  brands,
+  capabilities,
+  companyStrengths,
+  image,
+  productCategories,
+  products,
+  projects,
+  serviceProcess,
+  services as companyServices,
+} from './siteData'
 import './App.css'
 
 const projectFilters = [
   'All',
-  'Recent',
-  'Finished',
-  'Residential',
-  'Commercial',
-  'Custom Glass',
-  'Facades',
+  'Restaurants, Bars, and Coffee Shops',
+  'Supermarkets, Malls, and Spas',
+  'Schools',
+  'Hotels and Condominiums',
+  'Government and Private Institutions',
+  'Residential Projects',
+  'Hospitals',
+]
+const projectCategoryDescriptions = {
+  'Restaurants, Bars, and Coffee Shops':
+    'Glass and aluminum installations for restaurants, cafés, and bars.',
+  'Supermarkets, Malls, and Spas':
+    'Project work for shopping destinations, supermarkets, and spas.',
+  Schools: 'Glass and aluminum work for schools and educational institutions.',
+  'Hotels and Condominiums':
+    'Glazing and architectural details for hotels and residential towers.',
+  'Government and Private Institutions':
+    'Selected work for public institutions and private organizations.',
+  'Residential Projects': 'Thoughtful glass and aluminum details for homes.',
+  Hospitals: 'Glazing and project installations for hospitals and medical centers.',
+}
+const productPreviewSlugs = [
+  'low-e-glass',
+  'curtain-wall-systems',
+  'sliding-doors',
+  'tempered-glass',
 ]
 const currentYear = new Date().getFullYear()
 const brandSpeed = 32
@@ -37,6 +67,46 @@ function Arrow({ diagonal = false }) {
         <path d="M3 10h13m-5-5 5 5-5 5" />
       )}
     </svg>
+  )
+}
+
+function ImageSlot({
+  src,
+  alt = '',
+  label = 'Product Image Placeholder',
+  className = '',
+  loading = 'lazy',
+}) {
+  return (
+    <div className={`image-slot ${className}`}>
+      {src ? (
+        <img src={image(src)} alt={alt} loading={loading} />
+      ) : (
+        <span className="image-placeholder">
+          <i aria-hidden="true" className="bi bi-image" />
+          <span>{label}</span>
+        </span>
+      )}
+    </div>
+  )
+}
+
+function ProductCard({ product, index }) {
+  return (
+    <article className="catalog-card">
+      <a className="catalog-image" href={`#/products/${product.slug}`}>
+        <ImageSlot src={product.image} alt={product.alt ?? product.name} />
+        <span>{String(index + 1).padStart(2, '0')}</span>
+      </a>
+      <div className="catalog-copy">
+        <span className="eyebrow">{product.eyebrow}</span>
+        <h3>{product.name}</h3>
+        <p>{product.description}</p>
+        <a className="text-link" href={`#/products/${product.slug}`}>
+          Explore product <Arrow />
+        </a>
+      </div>
+    </article>
   )
 }
 
@@ -104,9 +174,9 @@ function Header({ page }) {
         </button>
         <div className="dropdown-panel" id="products-menu">
           <a href="#/products">All products</a>
-          {products.map((product) => (
-            <a key={product.slug} href={`#/products/${product.slug}`}>
-              {product.name}
+          {productCategories.map((category) => (
+            <a key={category.slug} href={`#/products?category=${category.slug}`}>
+              {category.name}
             </a>
           ))}
         </div>
@@ -134,7 +204,7 @@ function Header({ page }) {
           <a href="#/projects">All projects</a>
           {projectFilters.slice(1).map((filter) => (
             <a href={`#/projects?category=${encodeURIComponent(filter)}`} key={filter}>
-              {filter === 'Facades' ? 'Architectural facades' : filter}
+              {filter}
             </a>
           ))}
         </div>
@@ -208,12 +278,17 @@ function ProjectCard({ project, onOpen, index }) {
       className={`project-card project-card-${(index % 3) + 1}`}
       onClick={onOpen}
       type="button"
-      aria-label={`View ${project.title}, ${project.category} project`}
+      aria-label={`View ${project.title}${project.location ? `, ${project.location}` : ''}, ${project.category} project`}
     >
-      <img src={image(project.image)} alt={project.title} loading="lazy" />
+      <ImageSlot
+        src={project.image}
+        alt={project.title}
+        label="Project Image Placeholder"
+      />
       <span className="project-overlay">
         <span className="project-category">{project.category}</span>
         <span className="project-title">{project.title}</span>
+        {project.location && <span className="project-location">{project.location}</span>}
         <span className="project-open" aria-hidden="true">
           <Arrow diagonal />
         </span>
@@ -255,9 +330,17 @@ function Lightbox({ items, activeIndex, setActiveIndex, onClose }) {
         ‹
       </button>
       <figure onClick={(event) => event.stopPropagation()}>
-        <img src={image(item.image)} alt={item.title} />
+        <ImageSlot
+          src={item.image}
+          alt={item.title}
+          label={`${item.category === 'Product' ? 'Product' : 'Project'} Image Placeholder`}
+          className="lightbox-image-slot"
+        />
         <figcaption>
-          <span>{item.title}</span>
+          <div className="lightbox-caption-details">
+            <span>{item.title}</span>
+            {item.location && <span className="lightbox-location">{item.location}</span>}
+          </div>
           <span>{item.category}</span>
         </figcaption>
       </figure>
@@ -277,33 +360,12 @@ function Lightbox({ items, activeIndex, setActiveIndex, onClose }) {
 }
 
 function HomePage() {
-  const recent = projects.filter((project) => project.category === 'Recent').slice(0, 5)
-  const services = [
-    {
-      name: 'Residential',
-      image: 'residential projects/3.png',
-      copy: 'Thoughtful glass and aluminum details for the spaces you call home.',
-      category: 'Residential',
-    },
-    {
-      name: 'Commercial',
-      image: 'commercial projects/Automatic-slidingdoor-sphynxglass-1.jpg',
-      copy: 'Practical, considered installations for the places where business happens.',
-      category: 'Commercial',
-    },
-    {
-      name: 'Custom glass',
-      image: 'custom glass creation/unique-mirrors-sphynxglass-e1697870963730.jpg',
-      copy: 'Made-to-order glass details, mirrors and decorative creations.',
-      category: 'Custom Glass',
-    },
-    {
-      name: 'Architectural facades',
-      image: 'architecture facades/architectural-glass-sphynxglass-e1697821702965.jpg',
-      copy: 'Distinctive glass exteriors that bring architectural ideas to life.',
-      category: 'Facades',
-    },
-  ]
+  const recent = projects.slice(0, 5)
+  const projectCategories = projectFilters.slice(1).map((category) => ({
+    name: category,
+    copy: projectCategoryDescriptions[category],
+    image: projects.find((project) => project.category === category)?.image,
+  }))
 
   return (
     <>
@@ -345,7 +407,7 @@ function HomePage() {
           <div className="intro-columns">
             <p className="lead-copy">
               SPHYNX Glass and Aluminum supplies, fabricates and installs glass and
-              aluminum solutions for residential, commercial and industrial projects.
+              aluminum solutions for commercial and residential applications.
             </p>
             <div>
               <p>
@@ -373,7 +435,13 @@ function HomePage() {
           <div className="capability-grid">
             {capabilities.slice(0, 3).map((item, index) => (
               <article className={`capability-item capability-${index + 1}`} key={item.title}>
-                <img src={image(item.image)} alt={item.title} loading="lazy" />
+                {item.image ? (
+                  <img src={image(item.image)} alt={item.title} loading="lazy" />
+                ) : (
+                  <div className="capability-icon-placeholder" aria-hidden="true">
+                    <i className={`bi ${item.icon}`} />
+                  </div>
+                )}
                 <span>0{index + 1}</span><h3>{item.title}</h3>
               </article>
             ))}
@@ -388,13 +456,17 @@ function HomePage() {
           copy="Explore our work across homes, businesses and the built environment."
         />
         <div className="service-grid">
-          {services.map((service, index) => (
+          {projectCategories.map((service, index) => (
             <a
               className="service-card"
-              href={`#/projects?category=${encodeURIComponent(service.category)}`}
+              href={`#/projects?category=${encodeURIComponent(service.name)}`}
               key={service.name}
             >
-              <img src={image(service.image)} alt="" loading="lazy" />
+              <ImageSlot
+                src={service.image}
+                alt={`${service.name} project`}
+                className="service-card-image-slot"
+              />
               <div className="service-card-bottom">
                 <span>0{index + 1} / PROJECTS</span>
                 <h3>{service.name}</h3>
@@ -417,10 +489,10 @@ function HomePage() {
             <a className="text-link" href="#/products">View all products <Arrow /></a>
           </div>
           <div className="product-preview-grid">
-            {products.map((product, index) => (
+            {products.filter((product) => productPreviewSlugs.includes(product.slug)).map((product, index) => (
               <a className="product-preview" href={`#/products/${product.slug}`} key={product.slug}>
-                <div className={`product-preview-image ${product.contain ? 'contain-image' : ''}`}>
-                  <img src={image(product.image)} alt={product.alt} loading="lazy" />
+                <div className="product-preview-image">
+                  <ImageSlot src={product.image} alt={product.alt ?? product.name} />
                   <span className="product-number">0{index + 1}</span>
                   <span className="round-arrow"><Arrow diagonal /></span>
                 </div>
@@ -447,9 +519,13 @@ function HomePage() {
             <a
               className="home-project"
               href={`#/projects?category=${encodeURIComponent(project.category)}`}
-              key={project.image}
+              key={project.id}
             >
-              <img src={image(project.image)} alt={project.title} loading="lazy" />
+              <ImageSlot
+                src={project.image}
+                alt={project.title}
+                label="Project Image Placeholder"
+              />
               <span>{project.category} / 0{index + 1}</span>
               <h3>{project.title}</h3>
             </a>
@@ -692,33 +768,62 @@ function PageIntro({ label, title, copy, className = '' }) {
   )
 }
 
-function ProductsPage() {
+function ProductsPage({ initialCategory }) {
+  const [category, setCategory] = useState(
+    productCategories.some((item) => item.slug === initialCategory)
+      ? initialCategory
+      : 'all',
+  )
+  const visibleCategories =
+    category === 'all'
+      ? productCategories
+      : productCategories.filter((item) => item.slug === category)
+
   return (
     <>
       <PageIntro
         label="Products / Systems"
-        title={<>Built around <em>the view.</em></>}
+        title={<>Glass and aluminum <em>products.</em></>}
         className="products-intro photo-intro"
-        copy="A considered selection of glass and aluminum systems for architectural and commercial projects."
+        copy="Explore glass products, doors and windows, architectural systems, and other products supplied by SPHYNX."
       />
-      <section className="catalog-grid page-width">
-        {products.map((product, index) => (
-          <article className="catalog-card" key={product.slug}>
-            <a className={`catalog-image ${product.contain ? 'contain-image' : ''}`} href={`#/products/${product.slug}`}>
-              <img src={image(product.image)} alt={product.alt} />
-              <span>0{index + 1}</span>
-            </a>
-            <div className="catalog-copy">
-              <span className="eyebrow">{product.eyebrow}</span>
-              <h2>{product.name}</h2>
-              <p>{product.description}</p>
-              <a className="text-link" href={`#/products/${product.slug}`}>
-                Explore product <Arrow />
-              </a>
-            </div>
-          </article>
+      <div className="product-category-filters page-width" aria-label="Filter products by category">
+        <button
+          aria-pressed={category === 'all'}
+          className={category === 'all' ? 'selected' : ''}
+          onClick={() => setCategory('all')}
+          type="button"
+        >
+          All products
+        </button>
+        {productCategories.map((item) => (
+          <button
+            aria-pressed={category === item.slug}
+            className={category === item.slug ? 'selected' : ''}
+            key={item.slug}
+            onClick={() => setCategory(item.slug)}
+            type="button"
+          >
+            {item.name}
+          </button>
         ))}
-      </section>
+      </div>
+      {visibleCategories.map((item) => (
+        <section className="catalog-section page-width" key={item.slug}>
+          <h2>{item.name}</h2>
+          <div className="catalog-grid">
+            {products
+              .filter((product) => product.categorySlug === item.slug)
+              .map((product, index) => (
+                <ProductCard
+                  index={index}
+                  key={product.slug}
+                  product={product}
+                />
+              ))}
+          </div>
+        </section>
+      ))}
       <QuoteBand />
     </>
   )
@@ -737,10 +842,14 @@ function ProductDetail({ slug }) {
     )
   }
   const relatedProjects = projects
-    .filter((project) => project.category === 'Facades' || project.category === 'Commercial')
+    .filter((project) =>
+      ['Government and Private Institutions', 'Hotels and Condominiums'].includes(
+        project.category,
+      ),
+    )
     .slice(0, 3)
-  const gallery = [product.image, ...(product.gallery ?? [])].map((path, index) => ({
-    title: index === 0 ? product.name : `${product.name} — image ${index + 1}`,
+  const gallery = (product.gallery ?? []).map((path, index) => ({
+    title: `${product.name} — image ${index + 1}`,
     image: path,
     category: 'Product',
   }))
@@ -750,15 +859,19 @@ function ProductDetail({ slug }) {
       <section className="detail-hero page-width">
         <div className="detail-copy">
           <span className="eyebrow">{product.eyebrow} / Product {String(products.indexOf(product) + 1).padStart(2, '0')}</span>
-          <h1>{product.name}<br /><em>systems.</em></h1>
+          <h1>{product.name}</h1>
           <p>{product.description}</p>
           <a className="button button-gold" href={`#/contact?product=${product.slug}`}>
             Request a quote <Arrow diagonal />
           </a>
         </div>
-        <div className={`detail-hero-image ${product.contain ? 'contain-image' : ''}`}><img src={image(product.image)} alt={product.alt} /></div>
+        <ImageSlot
+          src={product.image}
+          alt={product.alt ?? product.name}
+          className="detail-hero-image"
+        />
       </section>
-      {product.gallery && (
+      {product.gallery?.length > 0 && (
         <section className="product-gallery page-width">
           <div className="section-topline">
             <SectionHeading eyebrow="Product gallery" title="Look a little closer." />
@@ -767,13 +880,17 @@ function ProductDetail({ slug }) {
           <div className="product-gallery-grid">
             {gallery.map((item, index) => (
               <button
-                className={index === 0 && product.contain ? 'contain-image' : ''}
+                className="product-gallery-slot"
                 key={`${item.image}-${index}`}
                 onClick={() => setActiveImage(index)}
                 type="button"
                 aria-label={`Expand ${item.title}`}
               >
-                <img src={image(item.image)} alt={index === 0 ? product.alt : item.title} loading="lazy" />
+                <ImageSlot
+                  src={item.image}
+                  alt={item.title}
+                  label="Product Image Placeholder"
+                />
                 <span>0{index + 1}</span>
               </button>
             ))}
@@ -796,7 +913,9 @@ function ProductDetail({ slug }) {
         />
         <div className="application-panel">
           <span className="eyebrow">Considered for</span>
-          <ul>{product.applications.map((application) => <li key={application}>{application}</li>)}</ul>
+          {product.applications.length > 0 && (
+            <ul>{product.applications.map((application) => <li key={application}>{application}</li>)}</ul>
+          )}
           <p>Talk with our team about project requirements, available configurations and installation details.</p>
         </div>
       </section>
@@ -804,8 +923,12 @@ function ProductDetail({ slug }) {
         <SectionHeading eyebrow="In context" title="Related project work" />
         <div className="related-grid">
           {relatedProjects.map((project) => (
-            <a href="#/projects" key={project.image}>
-              <img src={image(project.image)} alt={project.title} loading="lazy" />
+            <a href="#/projects" key={project.id}>
+              <ImageSlot
+                src={project.image}
+                alt={project.title}
+                label="Project Image Placeholder"
+              />
               <span>{project.category}</span><h3>{project.title}</h3>
               <Arrow diagonal />
             </a>
@@ -837,8 +960,22 @@ function ProjectsPage({ initialCategory }) {
       />
       <section className="gallery-section page-width">
         <div className="gallery-toolbar">
-          <span className="eyebrow">{String(visibleProjects.length).padStart(2, '0')} projects</span>
-          <div className="filter-list" aria-label="Filter projects">
+          <span className="eyebrow">Projects</span>
+          <div className="filter-list">
+            <label className="project-filter-select">
+              <span className="visually-hidden">Filter projects</span>
+              <select
+                aria-label="Filter projects"
+                onChange={(event) => setFilter(event.target.value)}
+                value={filter}
+              >
+                {projectFilters.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
             {projectFilters.map((category) => (
               <button
                 aria-pressed={filter === category}
@@ -847,7 +984,7 @@ function ProjectsPage({ initialCategory }) {
                 onClick={() => setFilter(category)}
                 type="button"
               >
-                {category === 'Facades' ? 'Facades' : category}
+                {category}
               </button>
             ))}
           </div>
@@ -856,7 +993,7 @@ function ProjectsPage({ initialCategory }) {
           {visibleProjects.map((project, index) => (
             <ProjectCard
               index={index}
-              key={project.image}
+              key={project.id}
               onOpen={() => setActiveIndex(index)}
               project={project}
             />
@@ -883,7 +1020,7 @@ function AboutPage() {
         label="About Sphynx"
         title={<>Expertise you <em>can build on.</em></>}
         className="about-intro photo-intro"
-        copy="SPHYNX Glass and Aluminum is a solutions provider for residential, commercial, industrial and government projects."
+        copy="SPHYNX Glass and Aluminum Supply designs, manufactures, supplies, and installs glass and aluminum products for commercial and residential applications."
       />
       <section className="about-story page-width section-pad">
         <div className="about-story-image">
@@ -900,14 +1037,15 @@ function AboutPage() {
         </div>
         <div className="about-story-copy">
           <span className="eyebrow">Our approach</span>
-          <h2>Quality work. <em>Built to last.</em></h2>
+          <h2>Glass and aluminum. <em>From design to installation.</em></h2>
           <p>
-            From supply and fabrication to installation, we focus on the details
-            that make glass and aluminum work beautifully in a space.
+            We provide custom architectural and commercial solutions, including
+            windows, doors, storefronts, entrances, and other glass and aluminum
+            installations.
           </p>
           <p>
-            Our work is grounded in durable materials, professional installation,
-            competitive quotations and a commitment to finishing on schedule.
+            Our capabilities include glass tempering and insulating, anodizing,
+            powder coating, and engineering support.
           </p>
           <a className="text-link" href="#/projects">Explore our projects <Arrow /></a>
         </div>
@@ -916,75 +1054,48 @@ function AboutPage() {
         <div className="page-width">
           <SectionHeading
             eyebrow="What we make and install"
-            title={<>Glass, aluminum <em>and more.</em></>}
-            copy="From glass supply and advanced processing to precise installation, our services support residential, commercial and architectural projects."
+            title={<>Design, supply <em>and installation.</em></>}
+            copy="SPHYNX provides custom glass and aluminum solutions for commercial and residential applications."
           />
           <div className="about-service-grid">
             <article className="about-service-card glass-supply-card">
               <img
                 className="about-service-image"
-                src={image('companys capabilities/Insulating-glass-sphynxglass-e1698000972334-768x528.jpg')}
-                alt="Insulating glass production"
+                src={image(capabilities[0].image)}
+                alt="Glass tempering capability"
                 loading="lazy"
               />
-              <span className="eyebrow">Glass products and supply</span>
-              <h3>Selected materials. <em>Advanced production.</em></h3>
+              <span className="eyebrow">Glass processing and engineering</span>
+              <h3>Glass capabilities. <em>Engineering support.</em></h3>
               <p>
-                We select quality glass and invest in production equipment to meet
-                demanding project requirements. Low-E (low-emissivity) glass uses
-                a thin, nearly invisible silver or multi-layer metal coating to
-                improve comfort and building energy performance.
+                Our capabilities include glass tempering and insulating, with
+                support from a dedicated engineering department.
               </p>
-              <ul className="service-benefits">
-                <li>Superior daylight control</li>
-                <li>Reduced solar heat</li>
-                <li>Improved energy efficiency</li>
-              </ul>
-              <details className="equipment-details">
-                <summary>Glass production equipment</summary>
-                <ul className="equipment-list">
-                  <li>Tempered glass production line</li>
-                  <li>Automatic insulated glass unit (IGU) production line</li>
-                  <li>Bent tempered glass production line</li>
-                  <li>Double-edge machine</li>
-                  <li>Horizontal edge grinding and cleaning line</li>
-                </ul>
-              </details>
             </article>
             <article className="about-service-card">
-              <img
-                className="about-service-image"
-                src={image('commercial projects/Automatic-slidingdoor-sphynxglass-1.jpg')}
-                alt="Glass and aluminum installation"
-                loading="lazy"
-              />
-              <span className="eyebrow">Glass and aluminum installation</span>
-              <h3>Careful installation. <em>Made for each space.</em></h3>
+              <div className="about-service-image about-service-icon" aria-hidden="true">
+                <i className="bi bi-truck" />
+              </div>
+              <span className="eyebrow">Warehouse and delivery</span>
+              <h3>Materials on hand. <em>Delivery support.</em></h3>
               <p>
-                Our installation team brings precision and attention to quality to
-                every project. Solutions include frameless glass doors, glass
-                railings and aluminum frames for homes, commercial spaces,
-                storefronts and other applications.
-              </p>
-              <p>
-                Each installation is tailored to the project, balancing the
-                appearance and functionality of the finished space.
+                Warehouse facilities support material availability, and a company
+                vehicle is used for customer deliveries.
               </p>
             </article>
             <article className="about-service-card">
               <img
                 className="about-service-image"
-                src={image('architecture facades/architectural-glass-sphynxglass-e1697821702965.jpg')}
-                alt="Architectural glass and panel facade"
+                src={image(capabilities[3].image)}
+                alt="Powder coating capability"
                 loading="lazy"
               />
-              <span className="eyebrow">Aluminum composite panels</span>
-              <h3>Durable panels. <em>Distinctive exteriors.</em></h3>
+              <span className="eyebrow">Custom solutions and installation</span>
+              <h3>Products for <em>spaces that work.</em></h3>
               <p>
-                We install aluminum composite panels for commercial and residential
-                projects. Their versatile finish supports contemporary facades and
-                renovations, bringing together functionality, visual appeal and
-                durability built to withstand the test of time.
+                From windows, doors, storefronts, and entrances to other
+                installations, our team works with clients on project-specific
+                glass and aluminum solutions.
               </p>
             </article>
           </div>
@@ -992,20 +1103,69 @@ function AboutPage() {
       </section>
       <section className="vision-section">
         <div className="page-width vision-grid">
-          <article><span className="eyebrow">Our vision</span><h2>Keep moving <em>forward.</em></h2><p>To continue growing and reaching more customers with high-standard products at competitive prices, while continuously improving our technology and capabilities.</p></article>
-          <article><span className="eyebrow">Our mission</span><h2>Good service. <em>Real value.</em></h2><ul><li>Provide innovative products at reasonable costs.</li><li>Deliver quality services and complete work on schedule.</li><li>Provide durable materials that stand the test of time.</li></ul></article>
+          <article><span className="eyebrow">Our mission</span><h2>Good service. <em>Real value.</em></h2><p>To provide customers with innovative products at reasonable costs, deliver quality services, complete projects on schedule, and provide durable materials that stand the test of time.</p></article>
+          <article><span className="eyebrow">Our vision</span><h2>Keep moving <em>forward.</em></h2><p>To continue growing, reach more customers, deliver high-standard quality products at competitive prices, and continuously improve our technology and capabilities.</p></article>
+        </div>
+      </section>
+      <section className="strengths-section page-width section-pad">
+        <SectionHeading
+          eyebrow="Why work with SPHYNX"
+          title={<>People, facilities <em>and capabilities.</em></>}
+          copy="Our team and facilities support glass and aluminum projects from planning through delivery."
+        />
+        <div className="strengths-grid">
+          {companyStrengths.map((strength) => (
+            <article className="strength-card" key={strength.title}>
+              <i aria-hidden="true" className={`bi ${strength.icon}`} />
+              <h3>{strength.title}</h3>
+            </article>
+          ))}
         </div>
       </section>
       <section className="capability-gallery page-width section-pad">
-        <SectionHeading eyebrow="Our capabilities" title={<>A closer look <em>at the process.</em></>} />
+        <SectionHeading eyebrow="Our capabilities" title={<>A closer look <em>at our facilities.</em></>} />
         <div className="capability-gallery-grid">
           {capabilities.map((item, index) => (
             <article key={item.title}>
-              <img src={image(item.image)} alt={item.title} loading="lazy" />
+              {item.image ? (
+                <img src={image(item.image)} alt={item.title} loading="lazy" />
+              ) : (
+                <div className="capability-gallery-icon" aria-hidden="true">
+                  <i className={`bi ${item.icon}`} />
+                </div>
+              )}
               <span>0{index + 1} / CAPABILITY</span><h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
           ))}
+        </div>
+      </section>
+      <section className="company-services section-pad">
+        <div className="page-width">
+          <SectionHeading
+            eyebrow="Services"
+            title={<>Support for your project <em>from the start.</em></>}
+            copy="Talk with our team about planning, estimating, product feasibility, finishing, and aluminum product repairs or remodeling."
+          />
+          <div className="company-service-grid">
+            {companyServices.map((service) => (
+              <article className="company-service-card" key={service.title}>
+                <i aria-hidden="true" className={`bi ${service.icon}`} />
+                <h3>{service.title}</h3>
+              </article>
+            ))}
+          </div>
+          <div className="service-process">
+            <h3>What to expect</h3>
+            <ol>
+              {serviceProcess.map((step, index) => (
+                <li key={step}>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <p>{step}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
       <QuoteBand />
@@ -1102,8 +1262,9 @@ function ContactPage({ params }) {
           <span className="eyebrow contact-details-heading"><i aria-hidden="true" className="bi bi-geo-alt-fill" /> Office locations</span>
           <div className="office-block">
             <span><i aria-hidden="true" className="bi bi-geo-alt" /> MAKATI OFFICE</span>
-            <p>Unit 235, Mile Long Building, Amorsolo Street corner Rufino Street, Barangay San Lorenzo, Makati City.</p>
-            <a href="https://maps.google.com/?q=Unit+235+Mile+Long+Building+Amorsolo+Rufino+Makati+City" target="_blank" rel="noreferrer">Get directions <Arrow diagonal /></a>
+            <p>Unit 235, Mile Long Building, Amorsolo Street corner Rufino Street, Barangay Pio Del Pilar, Makati City.</p>
+            <a href="https://maps.google.com/?q=Unit+235+Mile+Long+Building+Amorsolo+Rufino+Pio+Del+Pilar+Makati+City" target="_blank" rel="noreferrer">Get directions <Arrow diagonal /></a>
+            <a href="tel:+6327812480">Telephone: (02) 7812480</a>
           </div>
           <div className="office-block">
             <span><i aria-hidden="true" className="bi bi-geo-alt" /> PASAY OFFICE</span>
@@ -1214,13 +1375,13 @@ function Footer() {
       <div className="page-width footer-main">
         <div className="footer-brand">
           <img src={image('logos/logo white with text.png')} alt="Sphynx Glass and Aluminum" />
-          <p>Glass and aluminum solutions for residential, commercial and industrial projects.</p>
+          <p>Glass and aluminum products and services for commercial and residential applications.</p>
         </div>
         <div className="footer-links">
           <span>Explore</span><a href="#/">Home</a><a href="#/about">About us</a><a href="#/products">Products</a><a href="#/projects">Projects</a>
         </div>
         <div className="footer-links">
-          <span>Products</span>{products.map((product) => <a href={`#/products/${product.slug}`} key={product.slug}>{product.name}</a>)}
+          <span>Products</span>{productCategories.map((category) => <a href={`#/products?category=${category.slug}`} key={category.slug}>{category.name}</a>)}
         </div>
         <div className="footer-links">
           <span>Get in touch</span><a href="#/contact">Request a quote</a><p>Monday to Friday<br />8:00 AM – 5:00 PM</p>
@@ -1270,10 +1431,10 @@ function App() {
     }
     document.title = titles[page] ?? 'SPHYNX Glass and Aluminum'
     const descriptions = {
-      home: 'Glass and aluminum solutions for residential, commercial and industrial projects. Explore SPHYNX products, capabilities and project work.',
+      home: 'Glass and aluminum products and services for commercial and residential applications. Explore SPHYNX products, capabilities and project work.',
       about: 'Learn about SPHYNX Glass and Aluminum, our approach, vision, mission and capabilities.',
-      products: 'Explore curtain wall and spider fitting systems from SPHYNX Glass and Aluminum.',
-      projects: 'Explore residential, commercial, custom glass and architectural facade projects by SPHYNX.',
+      products: 'Explore glass products, doors and windows, architectural systems, and other products from SPHYNX Glass and Aluminum.',
+      projects: 'Explore completed glass and aluminum projects by SPHYNX Glass and Aluminum.',
       contact: 'Tell SPHYNX about your glass and aluminum project and request a quotation.',
     }
     document
@@ -1283,7 +1444,7 @@ function App() {
 
   let content
   if (page === 'products' && productSlug) content = <ProductDetail slug={productSlug} />
-  else if (page === 'products') content = <ProductsPage />
+  else if (page === 'products') content = <ProductsPage key={route.params.get('category') ?? 'all'} initialCategory={route.params.get('category')} />
   else if (page === 'projects') content = <ProjectsPage key={projectCategory ?? 'all'} initialCategory={projectCategory} />
   else if (page === 'about') content = <AboutPage />
   else if (page === 'contact') content = <ContactPage params={route.params} />

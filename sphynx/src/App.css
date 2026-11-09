@@ -1093,9 +1093,9 @@ button:hover .arrow-icon {
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  padding-block: 64px 100px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding-block: 38px 64px;
 }
 
 .catalog-card {
@@ -1105,7 +1105,7 @@ button:hover .arrow-icon {
 .catalog-image {
   position: relative;
   display: block;
-  height: clamp(260px, 36vw, 440px);
+  height: clamp(170px, 19vw, 230px);
   overflow: hidden;
   background: #deddd6;
 }
@@ -1130,7 +1130,7 @@ button:hover .arrow-icon {
 }
 
 .catalog-copy {
-  padding: 28px 30px 32px;
+  padding: 20px 20px 23px;
 }
 
 .catalog-copy h2 {
@@ -1403,7 +1403,7 @@ button:hover .arrow-icon {
   position: absolute;
   inset: auto 0 0;
   display: flex;
-  min-height: 115px;
+  min-height: 140px;
   flex-direction: column;
   justify-content: end;
   padding: 18px;
@@ -1424,6 +1424,18 @@ button:hover .arrow-icon {
   font-family: var(--heading);
   font-size: 15px;
   line-height: 1.3;
+}
+
+.project-location {
+  display: -webkit-box;
+  max-width: calc(100% - 45px);
+  margin-top: 4px;
+  overflow: hidden;
+  color: rgba(255, 255, 255, .82);
+  font-size: 10px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 
 .project-open {
@@ -1462,6 +1474,7 @@ button:hover .arrow-icon {
 
 .lightbox figcaption {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 30px;
   padding-top: 15px;
@@ -1469,7 +1482,18 @@ button:hover .arrow-icon {
   font-size: 12px;
 }
 
-.lightbox figcaption span + span {
+.lightbox-caption-details {
+  display: grid;
+  gap: 5px;
+}
+
+.lightbox-location {
+  max-width: 70ch;
+  color: rgba(255, 255, 255, .75);
+  line-height: 1.5;
+}
+
+.lightbox figcaption > span:last-child {
   color: var(--gold-light);
   text-transform: uppercase;
 }
@@ -1591,6 +1615,30 @@ button:hover .arrow-icon {
   object-fit: cover;
   object-position: center;
   background: #deddd5;
+}
+
+.about-service-icon {
+  display: grid;
+  place-items: center;
+  color: #a47d2b;
+  font-size: 38px;
+}
+
+.capability-icon-placeholder,
+.capability-gallery-icon {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: var(--gold-light);
+  background: #34352f;
+  font-size: 42px;
+}
+
+.capability-gallery-icon {
+  height: 200px;
+  color: #a47d2b;
+  background: #e6e4dc;
 }
 
 .about-service-card > .eyebrow {
@@ -2113,6 +2161,10 @@ button:hover .arrow-icon {
 }
 
 @media (max-width: 1020px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .page-width {
     width: calc(100% - 52px);
   }
@@ -2556,16 +2608,16 @@ button:hover .arrow-icon {
 
   .catalog-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding-block: 36px 72px;
+    gap: 16px;
+    padding-block: 28px 48px;
   }
 
   .catalog-image {
-    height: 320px;
+    height: 210px;
   }
 
   .catalog-copy {
-    padding: 24px;
+    padding: 18px;
   }
 
   .detail-hero {
@@ -2640,8 +2692,12 @@ button:hover .arrow-icon {
     font-size: 12px;
   }
 
+  .project-location {
+    font-size: 9px;
+  }
+
   .project-overlay {
-    min-height: 90px;
+    min-height: 105px;
     padding: 12px;
   }
 
@@ -2808,7 +2864,7 @@ button:hover .arrow-icon {
   }
 
   .catalog-image {
-    height: 260px;
+    height: 190px;
   }
 }
 
@@ -2820,5 +2876,359 @@ button:hover .arrow-icon {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+  }
+}
+
+/* Product and project image slots */
+.image-slot {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  background: #e6e4dc;
+  place-items: center;
+}
+
+.image-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  color: #5e5c54;
+  text-align: center;
+}
+
+.image-placeholder .bi {
+  color: #a47d2b;
+  font-size: 25px;
+  opacity: .8;
+}
+
+.image-placeholder > span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.product-preview-image > .image-slot,
+.catalog-image > .image-slot,
+.project-card > .image-slot {
+  position: absolute;
+  inset: 0;
+}
+
+.catalog-copy h3 {
+  margin-top: 7px;
+  font-size: 19px;
+  letter-spacing: -.025em;
+}
+
+.catalog-section {
+  padding-block: 34px 15px;
+}
+
+.catalog-section > h2 {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.catalog-section .catalog-grid {
+  padding-block: 20px 38px;
+}
+
+.catalog-card .eyebrow {
+  font-size: 9px;
+}
+
+.catalog-card .catalog-copy p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.catalog-card .catalog-copy .text-link {
+  margin-top: 14px;
+}
+
+.product-category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-block: 28px 8px;
+}
+
+.product-category-filters button {
+  min-height: 36px;
+  padding-inline: 14px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.product-category-filters button.selected,
+.product-category-filters button:hover {
+  border-color: var(--gold);
+  color: var(--ink);
+  background: #eeede7;
+}
+
+.detail-hero-image {
+  width: 100%;
+}
+
+.product-gallery-slot > .image-slot {
+  position: absolute;
+  inset: 0;
+}
+
+.related-grid .image-slot {
+  width: 100%;
+  height: 230px;
+}
+
+.home-project > .image-slot {
+  width: 100%;
+  height: 220px;
+}
+
+.service-card-image-slot {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #34352f;
+}
+
+.service-card-image-slot .image-placeholder {
+  color: rgba(255, 255, 255, .66);
+}
+
+.service-card-image-slot .image-placeholder .bi {
+  color: var(--gold-light);
+}
+
+.project-grid {
+  grid-auto-rows: 245px;
+}
+
+.project-card-2 {
+  grid-row: span 1;
+}
+
+.lightbox-image-slot {
+  width: min(80vw, 1100px);
+  height: min(75vh, 750px);
+  background: #292a26;
+}
+
+.lightbox-image-slot .image-placeholder {
+  color: rgba(255, 255, 255, .7);
+}
+
+.strengths-section > .section-heading {
+  margin-bottom: 38px;
+}
+
+.strengths-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.strength-card {
+  min-height: 144px;
+  padding: 24px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #eeede7;
+}
+
+.strength-card > .bi,
+.company-service-card > .bi {
+  color: #a47d2b;
+  font-size: 21px;
+}
+
+.strength-card h3 {
+  margin-top: 18px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.company-services {
+  background: #eeede7;
+}
+
+.company-service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 36px;
+}
+
+.company-service-card {
+  min-height: 130px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.company-service-card h3 {
+  margin-top: 14px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.service-process {
+  margin-top: 58px;
+}
+
+.service-process > h3 {
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.service-process ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-process li {
+  min-height: 140px;
+  padding: 20px;
+  border-top: 2px solid var(--gold);
+  background: var(--paper);
+}
+
+.service-process li > span {
+  color: #a47d2b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.service-process li p {
+  margin-top: 18px;
+  font-family: var(--heading);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .catalog-section .catalog-grid {
+    padding-block: 18px 36px;
+  }
+
+  .catalog-section {
+    padding-top: 26px;
+  }
+
+  .related-grid .image-slot {
+    height: 170px;
+  }
+
+  .home-project > .image-slot {
+    height: 180px;
+  }
+
+  .project-grid {
+    grid-auto-rows: 190px;
+  }
+
+  .strengths-grid,
+  .company-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .service-process ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lightbox-image-slot {
+    width: min(80vw, 700px);
+    height: min(72vh, 560px);
+  }
+}
+
+@media (max-width: 420px) {
+  .related-grid .image-slot {
+    height: 220px;
+  }
+
+  .home-project > .image-slot {
+    height: 145px;
+  }
+
+  .project-grid {
+    grid-auto-rows: 230px;
+  }
+
+  .strengths-grid,
+  .company-service-grid,
+  .service-process ol {
+    grid-template-columns: 1fr;
+  }
+
+  .lightbox-image-slot {
+    width: 78vw;
+    height: 65vh;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.project-filter-select {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .filter-list button {
+    display: none;
+  }
+
+  .project-filter-select {
+    display: block;
+    width: min(100%, 360px);
+  }
+
+  .project-filter-select select {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 42px 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    color: var(--ink);
+    background: #eeede7;
+    font-size: 13px;
   }
 }
