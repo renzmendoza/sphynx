@@ -1073,9 +1073,12 @@ function AboutPage() {
               </p>
             </article>
             <article className="about-service-card">
-              <div className="about-service-image about-service-icon" aria-hidden="true">
-                <i className="bi bi-truck" />
-              </div>
+              <img
+                className="about-service-image"
+                src={image(products.find((product) => product.slug === 'tempered-glass')?.image)}
+                alt="Tempered glass"
+                loading="lazy"
+              />
               <span className="eyebrow">Warehouse and delivery</span>
               <h3>Materials on hand. <em>Delivery support.</em></h3>
               <p>
