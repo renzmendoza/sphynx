@@ -3232,17 +3232,3 @@ button:hover .arrow-icon {
     font-size: 13px;
   }
 }
-
-@media (max-width: 760px) {
-  .catalog-image img,
-  .project-card img,
-  .service-card-image-slot img,
-  .capability-item img,
-  .product-preview-image img,
-  .home-project img,
-  .related-grid img,
-  .about-service-image,
-  .capability-gallery-grid img {
-    object-fit: contain;
-  }
-}
