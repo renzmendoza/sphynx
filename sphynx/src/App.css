@@ -3232,3 +3232,15 @@ button:hover .arrow-icon {
     font-size: 13px;
   }
 }
+
+@media (max-width: 760px) {
+  .catalog-image > .image-slot > img,
+  .project-card > .image-slot > img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
