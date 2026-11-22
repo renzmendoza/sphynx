@@ -30,8 +30,7 @@ const productImagePaths = {
   'Frameless Shower Enclosures': 'glass doors and windows/Frameless Shower Enclosures.jpg',
   'Sliding and Swing Shower Enclosures':
     'glass doors and windows/Sliding and Swing Shower Enclosures.jpg',
-  'Patch-Fitting Tempered Glass Doors':
-    'glass doors and windows/Patch-Fitting Tempered Glass Doors.jpg',
+  'Frameless Patch-Fitting Glass Doors': 'patch door.jpg',
   'Swing Amplemesh Screen Doors':
     'glass doors and windows/Swing Amplemesh Screen Doors.jpg',
   'Curtain Wall Systems': 'Architectural Systems/Curtain Wall Systems.jpg',
@@ -109,7 +108,7 @@ export const products = [
     ['Automatic Sensor-Type Frameless Sliding Glass Doors', 'Automatic sensor-type frameless sliding glass doors for project applications.'],
     ['Frameless Shower Enclosures', 'Frameless glass shower enclosures.'],
     ['Sliding and Swing Shower Enclosures', 'Shower enclosures with sliding or swing door configurations.'],
-    ['Patch-Fitting Tempered Glass Doors', 'Tempered glass doors with patch fittings.'],
+    ['Frameless Patch-Fitting Glass Doors', 'Frameless glass doors with patch fittings.'],
     ['Swing Amplemesh Screen Doors', 'Swing screen doors listed as Amplemesh in the company profile.'],
   ].map(([name, description]) => ({
     slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
@@ -223,7 +222,6 @@ const projectCategoryOverrides = {
   'After Tree Dessert Restaurant at MOA': 'Restaurants, Bars, and Coffee Shops',
   'Malabon Hospital and Medical Center': 'Hospitals',
   'Alabel Municipal Hall': 'Government and Private Institutions',
-  'Municipality of Alabel': 'Government and Private Institutions',
   'The Rise, Makati City': 'Hotels and Condominiums',
   'AIA Tower, Makati City': 'Government and Private Institutions',
   'ABB Inc.': 'Government and Private Institutions',
@@ -245,7 +243,8 @@ const projectImagePaths = {
   'Andok’s branches': 'finished projects/Andoks-project.jpg',
   'Asian Institute of Management': 'finished projects/AIM-project-e1697997753245.jpg',
   'ABB Inc.': 'finished projects/ABB-Inc.-Project-2-e1697998276383.jpg',
-  'Alabel Municipal Hall': 'recent projects/alabel-municipal-hall-sphynx-project.jpg',
+  'Alabel Municipal Hall': '/alabel.jpg',
+  'ACE Medical Center, Sta. Maria Bulacan': 'ace bulacan.jpg',
   'Citymall Dipolog': 'recent projects/Citymall-Dipolog.jpg',
   'Citymall Tuguegarao': 'recent projects/Citymall-Tuguegarao.jpg',
   'Coffee Bean Shop': 'finished projects/the-coffee-bean-shop.jpg',
@@ -253,7 +252,8 @@ const projectImagePaths = {
   'De La Salle University – School of Design and Arts':
     'finished projects/delasalle-project.jpg',
   'Kalayaan Hospital – Kawit, Cavite':
-    'recent projects/kalayan-hospital-sphynx-project.jpg',
+    'kalayaan.jpg',
+  'Malabon Hospital and Medical Center': 'malabon medical.jpg',
   'Malabon Medical Center': 'recent projects/Malabon-Medical-Center.jpg',
   'Marinduque Provincial Hospital':
     'recent projects/Marinduque Provincial Hospital Boac Newly Renovated Building_v3.jpg',
@@ -386,6 +386,7 @@ const profileProjects = [
     category: 'Hospitals',
     location: '1001 Mindanao Avenue, Quezon City',
     image: 'metro-north-hospital',
+    imagePath: 'metro north.jpg',
   },
   {
     title: 'Altro Mondo Creative Space',
@@ -428,18 +429,13 @@ const profileProjects = [
     category: 'Hospitals',
     location: '1357 Masangkay St., Santa Cruz, Manila',
     image: 'metropolitan-hospital',
+    imagePath: 'metropolitan.jpg',
   },
   {
     title: 'Doksip Delos Reyes Residence',
     category: 'Residential Projects',
     location: 'Alabang',
     image: 'doksip-delos-reyes-residence',
-  },
-  {
-    title: 'GOBO Office',
-    category: 'Government and Private Institutions',
-    location: 'Unit 402 Greenbelt Mansion, Perea St., Legazpi Village, Makati',
-    image: 'gobo-office',
   },
 ].map((project) => ({
   ...project,
@@ -498,6 +494,12 @@ const additionalProjects = [
     image: 'up manila - college of nursing.png',
   },
   {
+    id: 'barsam-corporate-center-trinity-university-of-asia',
+    title: 'Barsam Corporate Center, Trinity University of Asia',
+    category: 'Schools',
+    image: 'tua.jpg',
+  },
+  {
     id: 'dean-and-deluca',
     title: 'Dean & DeLuca',
     category: 'Supermarkets, Malls, and Spas',
@@ -512,11 +514,11 @@ export const projects = [
       title: 'Centuria Medical Center Sliding Doors',
     },
     {
-      image: 'ACE-Medical-Center-Sta-Maria-Bulacan.png',
+      image: 'ace bulacan.jpg',
       title: 'ACE Medical Center, Sta. Maria Bulacan',
     },
     {
-      image: 'alabel-municipal-hall-sphynx-project.jpg',
+      image: 'alabel.jpg',
       title: 'Alabel Municipal Hall',
     },
     {
@@ -576,10 +578,6 @@ export const projects = [
       title: 'MPT South Hub – Imus, Cavite',
     },
     {
-      image: 'Municipality-of-Alabel.jpeg',
-      title: 'Municipality of Alabel',
-    },
-    {
       image: 'okada-project-sphynx-glass-e1697968327570.jpg',
       title: 'Okada Glass Work',
     },
@@ -606,10 +604,6 @@ export const projects = [
     {
       image: 'shangrila-project-sphynxglass-e1697968441691.jpg',
       title: 'The Rise, Makati City',
-    },
-    {
-      image: 'sphynx-glass-project-e1697968523725.jpg',
-      title: 'Alabel Municipal Hall',
     },
     {
       image: 'sphynxglass-project-e1697968298175.jpg',
@@ -658,7 +652,7 @@ export const projects = [
       title: 'Land Registration Authority',
     },
     {
-      image: 'Malabon-3.png',
+      image: 'malabon medical.jpg',
       title: 'Malabon Hospital and Medical Center',
     },
     {

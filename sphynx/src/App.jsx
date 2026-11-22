@@ -1024,16 +1024,10 @@ function AboutPage() {
       />
       <section className="about-story page-width section-pad">
         <div className="about-story-image">
-          <video
-            aria-label="SPHYNX Glass and Aluminum company video"
-            controls
-            playsInline
-            poster={image(capabilities[0].image)}
-            preload="metadata"
-          >
-            <source src="/pics/Sphynx%20Video.mp4" type="video/mp4" />
-            Your browser does not support HTML video. Please use a browser that supports MP4 playback.
-          </video>
+          <img
+            src={image(capabilities[0].image)}
+            alt="Glass tempering capability"
+          />
         </div>
         <div className="about-story-copy">
           <span className="eyebrow">Our approach</span>

@@ -1552,14 +1552,14 @@ button:hover .arrow-icon {
   background: #22231f;
 }
 
-.about-story-image video {
+.about-story-image img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: auto 16 / 9;
+  aspect-ratio: 16 / 9;
   border-radius: 2px;
-  background: #111;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
 }
 
 .about-story-copy h2 {
