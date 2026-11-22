@@ -412,6 +412,7 @@ const profileProjects = [
     category: 'Restaurants, Bars, and Coffee Shops',
     location: 'Mall of Asia',
     image: 'gravy-baby-moa',
+    imagePath: 'gravy baby.png',
   },
   {
     title: 'Surge Gym – MPlace Mall',
