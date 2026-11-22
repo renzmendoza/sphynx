@@ -243,6 +243,7 @@ const projectImagePaths = {
   'Andok’s branches': 'finished projects/Andoks-project.jpg',
   'Asian Institute of Management': 'finished projects/AIM-project-e1697997753245.jpg',
   'ABB Inc.': 'finished projects/ABB-Inc.-Project-2-e1697998276383.jpg',
+  'AIA Tower, Makati City': 'AIA.jpg',
   'Alabel Municipal Hall': '/alabel.jpg',
   'ACE Medical Center, Sta. Maria Bulacan': 'ace bulacan.jpg',
   'Citymall Dipolog': 'recent projects/Citymall-Dipolog.jpg',
